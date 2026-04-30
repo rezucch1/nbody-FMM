@@ -34,7 +34,7 @@ Tensor &Tensor::operator=(const Tensor &&other){
   return *this = other;
 }
 
-double Tensor::operator[](size_t idx) const{
+double &Tensor::operator[](size_t idx) const{
   if (idx >= dim){
     std::cerr << "You have access outside the dimention of the tensor" << std::endl;
     std::exit(1);
