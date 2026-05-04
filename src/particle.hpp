@@ -5,6 +5,7 @@ class Particle;
 
 class Particle{
   public:
+    Particle(){};
     Particle(double mass, Tensor &&pos, Tensor &&vel);
 
     const double &get_mass() const;

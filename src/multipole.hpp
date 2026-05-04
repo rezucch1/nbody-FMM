@@ -9,7 +9,7 @@ class Multipole;
 
 class Multipole{
   public:
-    Multipole(const Multipole *parent, std::vector<Particle> particles, const Tensor &a, const Tensor &b); //constructor
+    Multipole(const Multipole *parent, std::vector<Particle>::iterator &particles_begin, std::vector<Particle>::iterator &particles_end, const Tensor &a, const Tensor &b); //constructor
 
   protected:
     const Multipole *parent; //pointer to parent multipole
