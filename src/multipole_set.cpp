@@ -5,3 +5,10 @@ MultipoleSetI::MultipoleSetI(unsigned int L)
 { 
 
 }
+
+MultipoleSetI &MultipoleSetI::operator+=(const PowerSetI &z)
+{
+    for(int i=0; i<elements.size(); ++i){
+        this->elements[i] += z.elements[i];
+    }
+}

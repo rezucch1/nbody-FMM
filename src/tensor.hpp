@@ -29,9 +29,11 @@ class Tensor{
     Tensor &operator-=(const Tensor &other);
     Tensor &operator-=(const Tensor &&other);
 
-    Tensor operator*=(double scalar);
+    Tensor &operator*=(double scalar);
     Tensor operator*(double scalar) const;
     Tensor operator/(double scalar) const;
+    Tensor &operator/=(double scalar);
+
 
     bool operator==(const Tensor &other) const;
 
@@ -42,6 +44,7 @@ class Tensor{
     double norm() const;
 
     size_t dim;
+    size_t grade;
     
   protected:
 

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "multipole_set.hpp"
+#include "power_set.hpp"
 
 template<>
-class MultipoleSet<2> : public MultipoleSetI {
+class PowerSet<2> : public PowerSetI {
     
     public: 
-    MultipoleSet(unsigned int);
+    PowerSet(unsigned int L, const Tensor &r);
     virtual std::complex<double> operator()(unsigned l, int m=0) override;
 
 };

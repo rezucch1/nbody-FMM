@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cmath>
 
-Tensor::Tensor(size_t dim)
+Tensor::Tensor(size_t dim, size_t grade)
   : dim(dim)
   , data(new double[dim])
   {}
@@ -100,7 +100,7 @@ Tensor Tensor::operator-() const{
   return other;
 }
 
-Tensor Tensor::operator*=(double scalar){
+Tensor &Tensor::operator*=(double scalar){
   for (size_t i = 0; i < dim; ++i)
     this->data[i] *= scalar;
   return *this;
@@ -119,11 +119,16 @@ Tensor operator*(double scalar, const Tensor &&vect){
   return vect*scalar;
 }
 
-Tensor Tensor::operator/(double scalar) const{
-  Tensor other(this->dim);
+Tensor &Tensor::operator/=(double scalar)
+{
   for (size_t i = 0; i < dim; ++i)
-    other.data[i] = this->data[i] / scalar;
-  return other;
+    data[i] /= scalar;
+  return *this;
+}
+
+Tensor Tensor::operator/(double scalar) const{
+  Tensor other(*this);
+  return other /= scalar;
 }
 
 bool Tensor::operator==(const Tensor &other) const{

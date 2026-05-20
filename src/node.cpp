@@ -1,8 +1,8 @@
 #include "node.hpp"
 constexpr unsigned int threshold = 5; 
 
-Multipole::Multipole(const Multipole *parent, std::vector<Particle>::iterator &particles_begin, std::vector<Particle>::iterator &particles_end, const Tensor &a, const Tensor &b)
-: parent(parent)
+Node::Node(const Node *parent, std::vector<Particle>::iterator &particles_begin, std::vector<Particle>::iterator &particles_end, const Tensor &a, const Tensor &b)
+: Multi_inter(parent)
 {
     const Tensor c = (a+b)/2;
     unsigned int counter[4]; //2D, dim
@@ -79,7 +79,7 @@ Multipole::Multipole(const Multipole *parent, std::vector<Particle>::iterator &p
                 b2[1]=b[1];
             }
 
-            children.push_back(Multipole(this, children_id[i], children_id[i + 1] , a2, b2));
+            children.push_back(std::make_unique<Node>(this, children_id[i], children_id[i + 1] , a2, b2));
         }
         else //è leaf
         {
