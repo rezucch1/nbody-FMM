@@ -2,20 +2,17 @@
 #include <vector>
 #include "tensor.hpp"
 #include <complex>
+#include "base_multipole_set_i.hpp"
 
-class PowerSetI{
+class PowerSetI;
+#include "multipole_set.hpp"
+
+class PowerSetI : public BaseMultipoleSetI{
     protected :
-    std::vector<double> elements;
-    unsigned int L;
     PowerSetI(unsigned int L);
     public :
-    virtual std::complex<double> operator()(unsigned l, int m)=0;
     PowerSetI &operator *= (double mass);
-
-    friend MultipoleSetI &MultipoleSetI::operator+=(const PowerSetI &);
 };
-
-#include "multipole_set.hpp"
 
 template<unsigned int dim>
 class PowerSet : public PowerSetI{

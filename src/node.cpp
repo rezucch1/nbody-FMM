@@ -1,8 +1,16 @@
 #include "node.hpp"
+#include "leaf.hpp"
 constexpr unsigned int threshold = 5; 
 
+
+    Tensor a = particles.begin()->get_position();
+    Tensor b = particles.begin()->get_position();
+
+    //2D
+    //TODO 3
+
 Node::Node(const Node *parent, std::vector<Particle>::iterator &particles_begin, std::vector<Particle>::iterator &particles_end, const Tensor &a, const Tensor &b)
-: Multi_inter(parent)
+: NodeI(parent)
 {
     const Tensor c = (a+b)/2;
     unsigned int counter[4]; //2D, dim
@@ -58,6 +66,7 @@ Node::Node(const Node *parent, std::vector<Particle>::iterator &particles_begin,
     for( i=0; i<4; i++){
         
         Tensor a2(a.dim), b2(b.dim);
+        std::unique_ptr<NodeI> child;
 
         if( counter[i] > threshold) //non è leaf
         {
@@ -79,13 +88,33 @@ Node::Node(const Node *parent, std::vector<Particle>::iterator &particles_begin,
                 b2[1]=b[1];
             }
 
-            children.push_back(std::make_unique<Node>(this, children_id[i], children_id[i + 1] , a2, b2));
+            child = std::make_unique<Node>(this, children_id[i], children_id[i + 1] , a2, b2);
         }
-        else //è leaf
+        else // è leaf
         {
-
+            child = std::make_unique<Leaf>(this, children_id[i], children_id[i + 1]);
         }
-        
+
+        children.push_back(child);
     }
 
+    calculateMC();
+
+    for (const auto &child : children)
+        *multipole_set += *getMultipoleSet(*child)->weigh_children_with_distance(NodeI::getMassCenter(*child) - mass_center);
+
+}
+
+void Node::calculateMC()
+{
+    mass_center= 0 * getMassCenter(*children[0]);
+    double total_mass = 0;
+    for(const auto &c : children){
+        double child_mass = (*getMultipoleSet(*c))(0).real();
+        total_mass += child_mass;
+        mass_center = child_mass * NodeI::getMassCenter(*c);
+    }
+    mass_center /= total_mass;
+
+    return;
 }

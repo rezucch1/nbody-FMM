@@ -1,9 +1,10 @@
 #pragma once
 #include <memory>
 
-#include "multipole.hpp"
+#include "node.hpp"
 
 class Tree{
+  public : Tree(std::vector<Particle> &);
   protected:
-    Multipole root;
+    Node root;
 };

@@ -1,7 +1,7 @@
 #pragma once
-#include "multi_inter.hpp"
+#include "node_i.hpp"
 
-class Leaf: public Multi_inter{
+class Leaf: public NodeI{
   protected:
     const std::vector<Particle>::iterator particles_begin;
     const std::vector<Particle>::iterator particles_end;

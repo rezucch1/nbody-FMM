@@ -2,19 +2,19 @@
 #include <vector>
 #include "tensor.hpp"
 #include <complex>
+#include "base_multipole_set_i.hpp"
 
 class MultipoleSetI;
 #include "power_set.hpp"
 
-
-class MultipoleSetI{
+class MultipoleSetI : public BaseMultipoleSetI{
     protected :
-    std::vector<double> elements;
-    unsigned int L;
-MultipoleSetI(unsigned int L);
+    MultipoleSetI(unsigned int L);
     public :
-    virtual std::complex<double> operator()(unsigned l, int m)=0;
     MultipoleSetI &operator += (const PowerSetI &z);
+    MultipoleSetI &operator += (const MultipoleSetI &z);
+    virtual std::unique_ptr<MultipoleSetI> weigh_children_with_distance (const Tensor &d) const=0;
+    static const std::vector<double> &getElements(const MultipoleSetI &_this);
 };
 
 template<unsigned int dim>

@@ -1,7 +1,7 @@
 #include "power_set.hpp"
 
 PowerSetI::PowerSetI(unsigned int L)
-:L(L)
+:BaseMultipoleSetI(L)
 { 
 
 }
