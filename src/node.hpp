@@ -11,7 +11,8 @@ class Node; //because I need to use the class INSIDE the class
 
 class Node: public NodeI{ //Multipole is a subclass of NodeI
   public:
-    Node(std::nullptr_t, __gnu_cxx::__normal_iterator<Particle *, std::vector<Particle, std::allocator<Particle>>>, __gnu_cxx::__normal_iterator<Particle *, std::vector<Particle, std::allocator<Particle>>>); //constructor
+    // Node(const Node *parent, std::vector<Particle>::iterator &&particles_begin, std::vector<Particle>::iterator &&particles_end); //constructor
+    Node(const Node *parent, std::vector<Particle>::iterator &&particles_begin, std::vector<Particle>::iterator &&particles_end); //constructor
     Node(const Node *parent, std::vector<Particle>::iterator &particles_begin, std::vector<Particle>::iterator &particles_end, const Tensor &a, const Tensor &b); //constructor
 
   protected:

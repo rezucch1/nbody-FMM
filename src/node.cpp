@@ -3,20 +3,29 @@
 constexpr unsigned int threshold = 5; 
 
 
-    Tensor a = particles.begin()->get_position();
-    Tensor b = particles.begin()->get_position();
+Node::Node(const Node *parent, std::vector<Particle>::iterator &&particles_begin, std::vector<Particle>::iterator &&particles_end)
+: NodeI(parent){
+    Tensor a = particles_begin->get_position();
+    Tensor b = particles_begin->get_position();
 
     //2D
     //TODO 3
+    _constructor(particles_begin, particles_end, a, b);
+}
 
 Node::Node(const Node *parent, std::vector<Particle>::iterator &particles_begin, std::vector<Particle>::iterator &particles_end, const Tensor &a, const Tensor &b)
-: NodeI(parent)
+    : NodeI(parent)
 {
-    const Tensor c = (a+b)/2;
-    unsigned int counter[4]; //2D, dim
+    _constructor(particles_begin, particles_end, a, b);
+}
+
+void Node::_constructor(std::vector<Particle>::iterator &particles_begin, std::vector<Particle>::iterator &particles_end, const Tensor &a, const Tensor &b)
+{
+    const Tensor c = (a + b) / 2;
+    unsigned int counter[4]; // 2D, dim
 
     for(int i=0; i<4; i++){
-            counter[i]=0; //initialize all counter to 0
+        counter[i]=0; //initialize all counter to 0
     }
 
     std::vector<Particle>::iterator children_id[5]; //2^dim + 1 divisione sottovettori punti estremi dei sottovettori

@@ -3,7 +3,5 @@
 
 Tree::Tree(std::vector<Particle> &particles)
 : root(nullptr, particles.begin(), particles.end())
-{
-}
-
+{}
 
