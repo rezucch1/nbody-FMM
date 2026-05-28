@@ -1,5 +1,6 @@
 #pragma once
 #include "node_i.hpp"
+#include "particle.hpp"
 
 class Leaf: public NodeI{
   protected:

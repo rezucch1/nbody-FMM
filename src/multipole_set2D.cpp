@@ -5,11 +5,12 @@
 inline MultipoleSet<2>::MultipoleSet(unsigned int L)
 : MultipoleSetI(L)
 {
+    elements.reserve(2*L + 1);
 }
 
 std::complex<double> MultipoleSet<2>::operator()(unsigned l, int m) const
 {
-    if (l=0) return std::complex<double>(elements[0], 0);
+    if (l == 0) return std::complex<double>(elements[0], 0);
     return std::complex<double>(elements[2*l-1], elements[2*l]);
 }
 

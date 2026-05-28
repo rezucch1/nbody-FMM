@@ -3,7 +3,6 @@
 PowerSetI::PowerSetI(unsigned int L)
 :BaseMultipoleSetI(L)
 { 
-
 }
 
 PowerSetI &PowerSetI::operator*=(double mass)

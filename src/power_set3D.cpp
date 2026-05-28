@@ -1,7 +1,7 @@
 #include "power_set3D.hpp"
 
 
-inline PowerSet<3>::PowerSet(unsigned int L, const Tensor &r)
+PowerSet<3>::PowerSet(unsigned int L, const Tensor &r)
 : PowerSetI(L)
 {
     elements.reserve((L+1)*(L+1));
@@ -36,7 +36,7 @@ inline PowerSet<3>::PowerSet(unsigned int L, const Tensor &r)
 
 }
 
-std::complex<double> PowerSet<3>::operator()(unsigned l, int m)
+std::complex<double> PowerSet<3>::operator()(unsigned l, int m) const
 {
     return std::complex<double>();
 }

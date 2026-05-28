@@ -6,15 +6,16 @@ Leaf::Leaf(const Node *parent, const std::vector<Particle>::iterator &particles_
         calculateMC();
         unsigned int L=2; //to be defined
         multipole_set = std::make_unique<MultipoleSet<2>>(L);
+        (*multipole_set) = 0;
         for( auto p = particles_begin; p< particles_end; ++p){
             Tensor r = p->get_position() - mass_center;
             
             std::unique_ptr<PowerSetI> z;
             if (r.dim == 2)
-                z = std::make_unique<PowerSet<2>>(L, r);
-            else if (r.dim == 3){
-                z = std::make_unique<PowerSet<3>>(L, r);
-            }
+                z = std::unique_ptr<PowerSet<2>>(new PowerSet<2>(L, r));
+            // else if (r.dim == 3){
+            //     z = std::make_unique<PowerSet<3>>(L, r);
+            // }
 
             (*z) *= p->get_mass();
             (*multipole_set) += *z;

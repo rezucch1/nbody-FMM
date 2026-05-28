@@ -7,7 +7,7 @@ class PowerSet<3> : public PowerSetI {
     
     public: 
     PowerSet(unsigned int L, const Tensor &r);
-    virtual std::complex<double> operator()(unsigned l, int m) override;
+    virtual std::complex<double> operator()(unsigned l, int m=0) const override;
 
 };
 

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cmath>
 
-Tensor::Tensor(size_t dim, size_t grade)
+Tensor::Tensor(size_t dim)
   : dim(dim)
   , data(new double[dim])
   {}

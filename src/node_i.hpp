@@ -1,8 +1,8 @@
 #pragma once
 #include <memory>
 #include "power_set.hpp"
-class NodeI;
-#include "node.hpp"
+class Node;
+// #include "node.hpp"
 
 //we need an Interface, with Multipole as a subclass (same with Leaf)
 class NodeI{

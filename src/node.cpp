@@ -8,8 +8,15 @@ Node::Node(const Node *parent, std::vector<Particle>::iterator &&particles_begin
     Tensor a = particles_begin->get_position();
     Tensor b = particles_begin->get_position();
 
-    //2D
-    //TODO 3
+    for (auto p = particles_begin + 1; p < particles_end; ++p){
+        for (unsigned int d = 0; d < a.dim; ++d){
+            if (p->get_position()[d] < a[d])
+                a[d] = p->get_position()[d];
+            else if (p->get_position()[d] > b[d])
+                b[d] = p->get_position()[d];
+        }
+        
+    }
     _constructor(particles_begin, particles_end, a, b);
 }
 
@@ -79,7 +86,7 @@ void Node::_constructor(std::vector<Particle>::iterator &particles_begin, std::v
 
         if( counter[i] > threshold) //non è leaf
         {
-            if(i & 1 == 0){//if the least significant bit=0
+            if((i & 1) == 0){//if the least significant bit=0
                 a2[0]=a[0];
                 b2[0]=c[0];
             }
@@ -88,7 +95,7 @@ void Node::_constructor(std::vector<Particle>::iterator &particles_begin, std::v
                 b2[0]=b[0];
             }
 
-            if(i & 2 == 0){ //if the second least significant bit=0
+            if((i & 2) == 0){ //if the second least significant bit=0
                 a2[1]=a[1];
                 b2[1]=c[1];
             }
@@ -104,7 +111,7 @@ void Node::_constructor(std::vector<Particle>::iterator &particles_begin, std::v
             child = std::make_unique<Leaf>(this, children_id[i], children_id[i + 1]);
         }
 
-        children.push_back(child);
+        children.push_back(std::move(child));
     }
 
     calculateMC();
