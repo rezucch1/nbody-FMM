@@ -1,8 +1,7 @@
 #include "multipole_set2D.hpp"
 
 
-
-inline MultipoleSet<2>::MultipoleSet(unsigned int L)
+MultipoleSet<2>::MultipoleSet(unsigned int L)
 : MultipoleSetI(L)
 {
     elements.reserve(2*L + 1);
@@ -26,11 +25,12 @@ std::unique_ptr<MultipoleSetI> MultipoleSet<2>::weigh_children_with_distance(con
         unsigned int bin = 1;
         for( int l = k; l<L; l++){
             std::complex mul_dk_cm = d_k * (*this)(l-k);
-            M->elements[2l-1] += bin * mul_dk_cm.real();
-            M->elements[2l] += bin * mul_dk_cm.imag();
+            M->elements[2*l-1] += bin * mul_dk_cm.real();
+            M->elements[2*l] += bin * mul_dk_cm.imag();
             bin *= (l+1);
             bin /= (l+1-k);
         }
     }
     return M;
 }
+template class MultipoleSet<2>;

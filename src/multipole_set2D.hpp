@@ -11,3 +11,5 @@ class MultipoleSet<2> : public MultipoleSetI {
     virtual std::unique_ptr<MultipoleSetI> weigh_children_with_distance(const Tensor &d) const override;
 };
 
+extern template class MultipoleSet<2>;
+

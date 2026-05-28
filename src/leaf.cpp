@@ -28,11 +28,16 @@ Leaf::Leaf(const Node *parent, const std::vector<Particle>::iterator &particles_
 
     void Leaf::calculateMC()
     {
-        mass_center= 0 * particles_begin->get_position();
         double total_mass = 0;
+
+        if (particles_begin == particles_end)
+            return;
+            
+        mass_center = 0 * particles_begin->get_position();
+
         for(std::vector<Particle>::iterator p = particles_begin; p < particles_end; p++){
             total_mass += p->get_mass();
-            mass_center = p->get_mass() * p->get_position();
+            mass_center += p->get_mass() * p->get_position();
         }
         mass_center /= total_mass;
 

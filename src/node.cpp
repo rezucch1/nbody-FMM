@@ -115,7 +115,9 @@ void Node::_constructor(std::vector<Particle>::iterator &particles_begin, std::v
     }
 
     calculateMC();
-
+    unsigned int L=2; //to be defined
+    multipole_set = std::make_unique<MultipoleSet<2>>(L);
+    (*multipole_set) = 0;
     for (const auto &child : children)
         *multipole_set += *getMultipoleSet(*child)->weigh_children_with_distance(NodeI::getMassCenter(*child) - mass_center);
 

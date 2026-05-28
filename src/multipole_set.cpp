@@ -28,7 +28,7 @@ MultipoleSetI &MultipoleSetI::operator=(std::nullptr_t)
     int i = 0;
     for (; i < elements.size(); ++i)
         elements[i] = 0.0;
-    for (; elements.capacity(); ++i)
+    for (; i < elements.capacity(); ++i)
         elements.push_back(0.0);
     return *this;
 }
