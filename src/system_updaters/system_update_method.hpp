@@ -3,7 +3,7 @@
 #include <vector>
 
 class SystemUpdateMethod;
-#include "tensor.hpp"
+#include "math_utils/tensor.hpp"
 #include "particle.hpp"
 
 constexpr double GRAV_CONST = 6.6743e-11;

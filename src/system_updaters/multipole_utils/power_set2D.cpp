@@ -1,5 +1,5 @@
 #include "power_set2D.hpp"
-#include "math_utils.hpp"
+#include "math_utils/math_utils.hpp"
 
 PowerSet<2>::PowerSet(unsigned int L, const Tensor &r)
 : PowerSetI(L)

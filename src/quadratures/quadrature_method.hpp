@@ -3,7 +3,7 @@
 class QuadratureMethod;
 #include "particle.hpp"
 
-#include "system_update_method.hpp"
+#include "system_updaters/system_update_method.hpp"
 
 class QuadratureMethod{
   public:

@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "tensor.hpp"
+#include "math_utils/tensor.hpp"
 #include <complex>
 #include "base_multipole_set_i.hpp"
 

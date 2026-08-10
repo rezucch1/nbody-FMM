@@ -1,7 +1,7 @@
 #pragma once
-#include "tensor.hpp"
+#include "math_utils/tensor.hpp"
 class Particle;
-#include "quadrature_method.hpp"
+#include "quadratures/quadrature_method.hpp"
 
 class Particle{
   public:
