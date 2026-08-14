@@ -7,4 +7,6 @@ class Tree{
   public : Tree(std::vector<Particle> &);
   protected:
     Node root;
+  public:
+    void print_highest_multipole();
 };

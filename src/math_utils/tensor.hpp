@@ -44,7 +44,6 @@ class Tensor{
     double norm() const;
 
     size_t dim;
-    size_t grade;
     
   protected:
 

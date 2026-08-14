@@ -30,10 +30,11 @@ Leaf::Leaf(const Node *parent, const std::vector<Particle>::iterator &particles_
     {
         double total_mass = 0;
 
+        // The mass_center should be initialized anyways, at least to 0;
+        mass_center = 0 * particles_begin->get_position();
+
         if (particles_begin == particles_end)
             return;
-            
-        mass_center = 0 * particles_begin->get_position();
 
         for(std::vector<Particle>::iterator p = particles_begin; p < particles_end; p++){
             total_mass += p->get_mass();

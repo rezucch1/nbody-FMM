@@ -12,7 +12,10 @@ class NodeI{
     Tensor mass_center;
     std::unique_ptr<MultipoleSetI> multipole_set;
 
+  public:
     static const std::unique_ptr<MultipoleSetI> &getMultipoleSet(const NodeI &_this); 
+  
+  protected:
     static const Tensor &getMassCenter(const NodeI &_this); 
     
     virtual void calculateMC() = 0; //mass center calculator

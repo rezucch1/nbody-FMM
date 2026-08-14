@@ -37,3 +37,7 @@ const std::vector<double> &MultipoleSetI::getElements(const MultipoleSetI &_this
 {
     return _this.elements;
 }
+
+std::ostream &operator<< (std::ostream &os, const MultipoleSetI &multipole){
+    return multipole.output_to_stream(os);
+}

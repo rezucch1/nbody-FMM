@@ -2,6 +2,7 @@
 #include <cstring>
 #include <iostream>
 #include <cmath>
+#include <cassert>
 
 Tensor::Tensor(size_t dim)
   : dim(dim)
@@ -46,7 +47,7 @@ double &Tensor::operator[](size_t idx) const{
 Tensor &Tensor::operator+=(const Tensor &other){
   if (other.dim != this->dim){
     std::cerr << "Can be summed only tensors with the same dim" << std::endl;
-    std::exit(1);
+    std::abort();
   }
 
   for (size_t i = 0; i < dim; ++i)
@@ -71,7 +72,7 @@ Tensor Tensor::operator+(const Tensor &&other) const{
 Tensor &Tensor::operator-=(const Tensor &other){
   if (other.dim != this->dim){
     std::cerr << "Can be summed only tensors with the same dim" << std::endl;
-    std::exit(1);
+    std::abort();
   }
 
   for (size_t i = 0; i < dim; ++i)

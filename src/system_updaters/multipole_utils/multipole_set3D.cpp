@@ -6,7 +6,7 @@ inline MultipoleSet<3>::MultipoleSet(unsigned int L)
 {
 }
 
-std::complex<double> MultipoleSet<3>::operator()(unsigned l, int m)
+std::complex<double> MultipoleSet<3>::operator()(unsigned l, int m) const
 {
     return std::complex<double>();
 }

@@ -16,13 +16,15 @@ std::complex<double> MultipoleSet<2>::operator()(unsigned l, int m) const
 std::unique_ptr<MultipoleSetI> MultipoleSet<2>::weigh_children_with_distance(const Tensor &d) const
 {
     std::unique_ptr<MultipoleSet<2>> M = std::make_unique<MultipoleSet<2>>(L);
-
-    M->elements[0] = MultipoleSetI::getElements(*this)[0];
+    
+    M->elements.push_back(MultipoleSetI::getElements(*this)[0]);
     std::complex<double> d_k = 1;
 
-    for(int k = 1; k < L; k++){
+    for(int k = 1; k <= L; k++){
         d_k *= std::complex{d[0], d[1]};
         unsigned int bin = 1;
+        M->elements.push_back(0.0);
+        M->elements.push_back(0.0);
         for( int l = k; l<L; l++){
             std::complex mul_dk_cm = d_k * (*this)(l-k);
             M->elements[2*l-1] += bin * mul_dk_cm.real();
@@ -33,4 +35,5 @@ std::unique_ptr<MultipoleSetI> MultipoleSet<2>::weigh_children_with_distance(con
     }
     return M;
 }
+
 template class MultipoleSet<2>;
