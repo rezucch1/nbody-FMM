@@ -12,12 +12,11 @@ class Node; //because I need to use the class INSIDE the class
 class Node: public NodeI{ //Multipole is a subclass of NodeI
   public:
     // Node(const Node *parent, std::vector<Particle>::iterator &&particles_begin, std::vector<Particle>::iterator &&particles_end); //constructor
-    Node(const Node *parent, std::vector<Particle>::iterator &&particles_begin, std::vector<Particle>::iterator &&particles_end); //constructor
-    Node(const Node *parent, std::vector<Particle>::iterator &particles_begin, std::vector<Particle>::iterator &particles_end, const Tensor &a, const Tensor &b); //constructor
+
+    // const Multipole *parent; //pointer to parent multipole
+    Node(const Node *parent, Particle** particles_begin, Particle** particles_end, const Tensor &a, const Tensor &b); //constructor
 
   protected:
-    void _constructor(std::vector<Particle>::iterator &particles_begin, std::vector<Particle>::iterator &particles_end, const Tensor &a, const Tensor &b);
-    // const Multipole *parent; //pointer to parent multipole
     std::vector<std::unique_ptr<NodeI>> children; //array of children
     virtual void calculateMC() override;
     //we're in the middle

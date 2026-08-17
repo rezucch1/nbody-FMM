@@ -1,32 +1,9 @@
 #include "node.hpp"
 #include "leaf.hpp"
-constexpr unsigned int threshold = 5; 
+constexpr unsigned int threshold = 5;
 
-
-Node::Node(const Node *parent, std::vector<Particle>::iterator &&particles_begin, std::vector<Particle>::iterator &&particles_end)
-: NodeI(parent){
-    Tensor a = particles_begin->get_position();
-    Tensor b = particles_begin->get_position();
-
-    for (auto p = particles_begin + 1; p < particles_end; ++p){
-        for (unsigned int d = 0; d < a.dim; ++d){
-            if (p->get_position()[d] < a[d])
-                a[d] = p->get_position()[d];
-            else if (p->get_position()[d] > b[d])
-                b[d] = p->get_position()[d];
-        }
-        
-    }
-    _constructor(particles_begin, particles_end, a, b);
-}
-
-Node::Node(const Node *parent, std::vector<Particle>::iterator &particles_begin, std::vector<Particle>::iterator &particles_end, const Tensor &a, const Tensor &b)
+Node::Node(const Node *parent, Particle** particles_begin, Particle** particles_end, const Tensor &a, const Tensor &b)
     : NodeI(parent)
-{
-    _constructor(particles_begin, particles_end, a, b);
-}
-
-void Node::_constructor(std::vector<Particle>::iterator &particles_begin, std::vector<Particle>::iterator &particles_end, const Tensor &a, const Tensor &b)
 {
     const Tensor c = (a + b) / 2;
     unsigned int counter[4]; // 2D, dim
@@ -35,12 +12,12 @@ void Node::_constructor(std::vector<Particle>::iterator &particles_begin, std::v
         counter[i]=0; //initialize all counter to 0
     }
 
-    std::vector<Particle>::iterator children_id[5]; //2^dim + 1 divisione sottovettori punti estremi dei sottovettori
+    Particle** children_id[5]; //2^dim + 1 divisione sottovettori punti estremi dei sottovettori
     int i;
-    for(std::vector<Particle>::iterator p = particles_begin; p < particles_end; p++){
-        i = p->get_position()[0] > c[0]; //c[0] is the x position of c
+    for(Particle** p = particles_begin; p < particles_end; p++){
+        i = (*p)->get_position()[0] > c[0]; //c[0] is the x position of c
         //if particle p is on c's left, i=0; if particle p is on c's right, i=1;
-        i += 2 * (p->get_position()[1] > c[1]); //if TRUE, i+=10; if FALSE i=i;
+        i += 2 * ((*p)->get_position()[1] > c[1]); //if TRUE, i+=10; if FALSE i=i;
         //we add 10 if particle p is below c (in y terms)
         counter[i]++; //count how many particles inside the child multiltpole
 
@@ -57,20 +34,21 @@ void Node::_constructor(std::vector<Particle>::iterator &particles_begin, std::v
     //let's STACK
     {
         //we create a temporary array pf particles
-        Particle part_temp[particles_end - particles_begin];
+        Particle* part_temp[particles_end - particles_begin];
         std::move(particles_begin, particles_end, part_temp); //move all our particles array in temporary array
         //now our initial particles array is EMPTY
 
         for(i=0; i<4; i++){
             counter[i]=0; //initialize all counter to 0
         }
+
         for(int p = 0; p < particles_end - particles_begin; p++){
-            i = part_temp[p].get_position()[0] > c[0]; //c[0] is the x position of c
+            i = part_temp[p]->get_position()[0] > c[0]; //c[0] is the x position of c
             //if particle p is on c's left, i=0; if particle p is on c's right, i=1;
-            i += 2 * (part_temp[p].get_position()[1] > c[1]); //if TRUE, i+=10; if FALSE i=i;
+            i += 2 * (part_temp[p]->get_position()[1] > c[1]); //if TRUE, i+=10; if FALSE i=i;
             //we add 10 (binary, so it's 2) if particle p is below c (in y terms)
 
-            *(children_id[i] + counter[i]) = std::move(part_temp[p]);
+            *(children_id[i] + counter[i]) = part_temp[p];
             //children_id refers to the start of the child-cell i
             //counter[i] refers to the offset
             counter[i]++; //count how many particles inside the child multiltpole

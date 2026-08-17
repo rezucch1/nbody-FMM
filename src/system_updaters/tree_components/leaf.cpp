@@ -1,14 +1,14 @@
 #include "leaf.hpp"
 #include "multipole_set.hpp"
-Leaf::Leaf(const Node *parent, const std::vector<Particle>::iterator &particles_begin,
-    const std::vector<Particle>::iterator &particles_end): NodeI(parent), particles_begin(particles_begin), particles_end(particles_end)
+Leaf::Leaf(const Node *parent, Particle** particles_begin,
+    Particle** particles_end): NodeI(parent), particles_begin(particles_begin), particles_end(particles_end)
     {
         calculateMC();
         unsigned int L=2; //to be defined
         multipole_set = std::make_unique<MultipoleSet<2>>(L);
         (*multipole_set) = 0;
         for( auto p = particles_begin; p< particles_end; ++p){
-            Tensor r = p->get_position() - mass_center;
+            Tensor r = (*p)->get_position() - mass_center;
             
             std::unique_ptr<PowerSetI> z;
             if (r.dim == 2)
@@ -17,7 +17,7 @@ Leaf::Leaf(const Node *parent, const std::vector<Particle>::iterator &particles_
             //     z = std::make_unique<PowerSet<3>>(L, r);
             // }
 
-            (*z) *= p->get_mass();
+            (*z) *= (*p)->get_mass();
             (*multipole_set) += *z;
         }
 
@@ -31,14 +31,14 @@ Leaf::Leaf(const Node *parent, const std::vector<Particle>::iterator &particles_
         double total_mass = 0;
 
         // The mass_center should be initialized anyways, at least to 0;
-        mass_center = 0 * particles_begin->get_position();
+        mass_center = 0 * (*particles_begin)->get_position();
 
         if (particles_begin == particles_end)
             return;
 
-        for(std::vector<Particle>::iterator p = particles_begin; p < particles_end; p++){
-            total_mass += p->get_mass();
-            mass_center += p->get_mass() * p->get_position();
+        for(Particle** p = particles_begin; p < particles_end; p++){
+            total_mass += (*p)->get_mass();
+            mass_center += (*p)->get_mass() * (*p)->get_position();
         }
         mass_center /= total_mass;
 

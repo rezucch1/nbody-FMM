@@ -14,9 +14,9 @@ int main(){
   srand(1111);
   for (unsigned int p = 0; p < NUM_PARTICLES; ++p)
     particles.push_back(Particle(rand()*MAX_MASS/RAND_MAX, {rand()*(2*DOMAIN_BOUND)/RAND_MAX - DOMAIN_BOUND, rand()*(2*DOMAIN_BOUND)/RAND_MAX - DOMAIN_BOUND}, {rand()*(2*MAX_VEL)/RAND_MAX - MAX_VEL, rand()*(2*MAX_VEL)/RAND_MAX - MAX_VEL}));
-  Tree t(particles);
+  Tree t(particles.begin(), particles.end());
   std::cout << "The computed multipoles at the highet level are: ";
-  t.print_highest_multipole();
+  t.print_root_multipoles();
 }
 
 

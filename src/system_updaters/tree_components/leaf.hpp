@@ -4,12 +4,12 @@
 
 class Leaf: public NodeI{
   protected:
-    const std::vector<Particle>::iterator particles_begin;
-    const std::vector<Particle>::iterator particles_end;
+    Particle** particles_begin;
+    Particle** particles_end;
     virtual void calculateMC() override;
   public:
-    Leaf(const Node *parent, const std::vector<Particle>::iterator &particles_begin,
-         const std::vector<Particle>::iterator &particles_end); //constructor
+    Leaf(const Node *parent, Particle** particles_begin,
+         Particle** particles_end); //constructor
   
 
 
