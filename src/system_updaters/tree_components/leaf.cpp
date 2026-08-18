@@ -1,7 +1,7 @@
 #include "leaf.hpp"
 #include "multipole_set.hpp"
 Leaf::Leaf(const Node *parent, Particle** particles_begin,
-    Particle** particles_end): NodeI(parent), particles_begin(particles_begin), particles_end(particles_end)
+    Particle** particles_end): NodeI(parent, particles_begin, particles_end)
     {
         calculateMC();
         unsigned int L=2; //to be defined

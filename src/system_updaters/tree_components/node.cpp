@@ -3,7 +3,7 @@
 constexpr unsigned int threshold = 5;
 
 Node::Node(const Node *parent, Particle** particles_begin, Particle** particles_end, const Tensor &a, const Tensor &b)
-    : NodeI(parent)
+    : NodeI(parent, particles_begin, particles_end)
 {
     const Tensor c = (a + b) / 2;
     unsigned int counter[4]; // 2D, dim
@@ -99,6 +99,13 @@ Node::Node(const Node *parent, Particle** particles_begin, Particle** particles_
     for (const auto &child : children)
         *multipole_set += *getMultipoleSet(*child)->weigh_children_with_distance(NodeI::getMassCenter(*child) - mass_center);
 
+}
+
+void Node::get_partition(std::vector<std::tuple<Particle *, int, int>> &partitions, int level, int partition_id) const{
+    NodeI::get_partition(partitions, level, partition_id);
+
+    for (size_t i = 0; i < children.size(); ++i)
+        children[i]->get_partition(partitions, level+1, partition_id * (1<<dim) + i);
 }
 
 void Node::calculateMC()

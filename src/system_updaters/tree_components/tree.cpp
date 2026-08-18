@@ -30,3 +30,10 @@ void Tree::print_root_multipoles(){
 
   std::cout << *multipole << std::endl;
 }
+
+std::vector<std::tuple<Particle *, int, int>> Tree::get_partition()
+{
+  std::vector<std::tuple<Particle *, int, int>> partitions;
+  root.get_partition(partitions, 0, 0);
+  return partitions;
+}

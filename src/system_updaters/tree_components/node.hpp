@@ -16,6 +16,8 @@ class Node: public NodeI{ //Multipole is a subclass of NodeI
     // const Multipole *parent; //pointer to parent multipole
     Node(const Node *parent, Particle** particles_begin, Particle** particles_end, const Tensor &a, const Tensor &b); //constructor
 
+    void get_partition(std::vector<std::tuple<Particle*, int, int>> &partitions, int level, int partition_id) const override;
+
   protected:
     std::vector<std::unique_ptr<NodeI>> children; //array of children
     virtual void calculateMC() override;

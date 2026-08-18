@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <vector>
+#include <tuple>
 
 #include "node.hpp"
 
@@ -16,4 +17,5 @@ class Tree{
     static Node init_root(Tree* _this, Particle* begin, Particle* end);
   public:
     void print_root_multipoles();
+    std::vector<std::tuple<Particle*, int, int>> get_partition();
 };
