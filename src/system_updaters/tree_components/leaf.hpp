@@ -6,7 +6,7 @@ class Leaf: public NodeI{
   protected:
     virtual void calculateMC() override;
   public:
-    Leaf(const Node *parent, Particle** particles_begin,
+    Leaf(std::vector<std::vector<std::unique_ptr<NodeI>>> &allocator, unsigned int depth, unsigned int child_id, Particle** particles_begin,
          Particle** particles_end); //constructor
   
 

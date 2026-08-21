@@ -14,12 +14,19 @@ class Node: public NodeI{ //Multipole is a subclass of NodeI
     // Node(const Node *parent, std::vector<Particle>::iterator &&particles_begin, std::vector<Particle>::iterator &&particles_end); //constructor
 
     // const Multipole *parent; //pointer to parent multipole
-    Node(const Node *parent, Particle** particles_begin, Particle** particles_end, const Tensor &a, const Tensor &b); //constructor
+    Node(std::vector<std::vector<std::unique_ptr<NodeI>>> &allocator, unsigned int depth, unsigned int id_child, Particle** particles_begin, Particle** particles_end, const Tensor &a, const Tensor &b); //constructor
+    // const std::vector<std::unique_ptr<NodeI>> &get_children() const;
+    const std::vector<NodeI *> &get_neighbours() const;
 
-    void get_partition(std::vector<std::tuple<Particle*, int, int>> &partitions, int level, int partition_id) const override;
+    void get_partition(std::vector<std::tuple<Particle*, int, int>> &partitions) const override;
 
   protected:
-    std::vector<std::unique_ptr<NodeI>> children; //array of children
+    NodeI* get_child(unsigned int idx);
+    std::vector<std::unique_ptr<NodeI>>::iterator get_children_begin();
+    std::vector<std::unique_ptr<NodeI>>::iterator get_children_end();
+
+    std::vector<std::unique_ptr<NodeI>>::const_iterator get_children_begin() const;
+    std::vector<std::unique_ptr<NodeI>>::const_iterator get_children_end() const;
     virtual void calculateMC() override;
     //we're in the middle
 };

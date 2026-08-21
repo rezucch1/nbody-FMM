@@ -8,14 +8,16 @@
 class Tree{
   public :
     template <class InputIt>
-    Tree(InputIt begin, InputIt end) : root(init_root(this, &*begin, &*end)){}
+    Tree(InputIt begin, InputIt end){init_root(&*begin, &*end);};
 
   protected:
-    std::vector<Particle*> particle_ordering; 
-    Node root;
+    std::vector<Particle*> particle_ordering;
+    std::vector<std::vector<std::unique_ptr<NodeI>>> nodes_vector;
+    // Node root;
 
-    static Node init_root(Tree* _this, Particle* begin, Particle* end);
+    void init_root(Particle* begin, Particle* end);
   public:
     void print_root_multipoles();
     std::vector<std::tuple<Particle*, int, int>> get_partition();
+    std::vector<std::tuple<NodeI*, NodeI*, unsigned int, char, Particle*>> get_nodes_interactions();
 };
