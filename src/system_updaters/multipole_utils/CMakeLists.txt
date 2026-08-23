@@ -6,4 +6,5 @@ add_library(multipole_utils OBJECT
     power_set.cpp
     power_set2D.cpp
     power_set3D.cpp
+    local_set2D.cpp
 )

@@ -94,22 +94,42 @@ Node::Node(std::vector<std::vector<std::unique_ptr<NodeI>>> &allocator, unsigned
         }
         allocator[depth + 1][current_child_id] = std::move(child);
     }
-
-    calculateMC();
-    unsigned int L=2; //to be defined
-    multipole_set = std::make_unique<MultipoleSet<2>>(L);
-    (*multipole_set) = 0;
-    for (auto c = get_children_begin(); c < get_children_end(); ++c) if (*c)
-        *multipole_set += *getMultipoleSet(**c)->weigh_children_with_distance(NodeI::getMassCenter(**c) - mass_center);
-
 }
 
 // const std::vector<std::unique_ptr<NodeI>> &Node::get_children() const{
 //   return children;
 // }
 
-const std::vector<NodeI *> &Node::get_neighbours() const{
-    return neighbours_list;
+void Node::compute_multipoles(unsigned int L){
+
+    for (auto c = get_children_begin(); c < get_children_end(); ++c) if (*c)
+        (*c)->compute_multipoles(L);
+
+    calculateMC();
+
+    multipole_set = std::make_unique<MultipoleSet<2>>(L);
+    (*multipole_set) = 0;
+    for (auto c = get_children_begin(); c < get_children_end(); ++c) if (*c)
+        *multipole_set += *getMultipoleSet(**c)->weigh_children_with_distance(NodeI::getMassCenter(**c) - mass_center);
+}
+
+void Node::collect_multipoles_to_locals(){
+    NodeI::collect_multipoles_to_locals();
+
+    for (auto c = get_children_begin(); c < get_children_end(); ++c) if (*c)
+        (*c)->collect_multipoles_to_locals();
+}
+
+void Node::propagate_locals(LocalSetI *parent_local){
+    NodeI::propagate_locals(parent_local);
+
+    for (auto c = get_children_begin(); c < get_children_end(); ++c) if (*c)
+        (*c)->propagate_locals(local_set->distribute_parent_with_distance(getMassCenter(**c) - mass_center));
+}
+
+const std::vector<NodeI *> &Node::get_neighbours() const
+{
+  return neighbours_list;
 }
 
 void Node::get_partition(std::vector<std::tuple<Particle *, int, int>> &partitions) const{

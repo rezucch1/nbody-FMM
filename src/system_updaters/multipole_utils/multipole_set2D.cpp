@@ -36,4 +36,42 @@ std::unique_ptr<MultipoleSetI> MultipoleSet<2>::weigh_children_with_distance(con
     return M;
 }
 
+std::unique_ptr<LocalSetI> MultipoleSet<2>::to_local(const Tensor &d) const{
+    
+    std::unique_ptr<LocalSet<2>> local = std::make_unique<LocalSet<2>>(L);
+
+    std::complex<double> z(d[0], d[1]);
+
+    local->get_element(0) = (*this)(0)*std::log(z);
+
+    std::complex<double> z_k = 1;
+
+    for (unsigned int k = 1; k <= L; ++k){
+        z_k *= z; 
+        local->get_element(0) -= (*this)(k)/((double)k * z_k);
+    }
+
+    int sign = -1; 
+    std::complex<double> z_n = 1;
+
+    for (unsigned int n = 1; n <= L; ++n){
+        sign = -sign;
+        z_n *= z;
+        local->get_element(n) = (double)sign * (*this)(0) / ((double) n * z_n);
+
+        std::complex<double> z_kn = z_n;
+        unsigned int bin_coef = 1;
+
+        for (unsigned int k = 1; k <= L; ++k){
+            z_k *= z; 
+            local->get_element(0) += (double)sign * bin_coef * (*this)(k)/((double)k * z_k);
+            bin_coef *= k + n;
+            bin_coef /= k;
+        }
+    }
+
+    return local;
+
+}
+
 template class MultipoleSet<2>;

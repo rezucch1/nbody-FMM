@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-void Tree::init_root(Particle* begin, Particle* end){
+void Tree::init_tree(Particle* begin, Particle* end){
   particle_ordering.reserve(end - begin);
 
   auto p = begin;
@@ -30,6 +30,10 @@ void Tree::init_root(Particle* begin, Particle* end){
       if (n)
         n->compute_interaction_list();
     }
+  
+  nodes_vector[0][0]->compute_multipoles(2);
+  nodes_vector[0][0]->collect_multipoles_to_locals();
+  nodes_vector[0][0]->propagate_locals();
 }
 
 void Tree::print_root_multipoles(){

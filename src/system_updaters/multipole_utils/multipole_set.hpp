@@ -7,6 +7,7 @@
 
 class MultipoleSetI;
 #include "power_set.hpp"
+#include "local_set.hpp"
 
 class MultipoleSetI : public BaseMultipoleSetI{
     protected :
@@ -20,6 +21,7 @@ class MultipoleSetI : public BaseMultipoleSetI{
     MultipoleSetI &operator += (const MultipoleSetI &z);
     MultipoleSetI &operator = (std::nullptr_t);
     virtual std::unique_ptr<MultipoleSetI> weigh_children_with_distance (const Tensor &d) const=0;
+    virtual std::unique_ptr<LocalSetI> to_local(const Tensor &d) const = 0;
     static const std::vector<double> &getElements(const MultipoleSetI &_this);
 };
 

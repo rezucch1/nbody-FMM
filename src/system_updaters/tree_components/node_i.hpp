@@ -31,6 +31,7 @@ class NodeI{
 
     Tensor mass_center;
     std::unique_ptr<MultipoleSetI> multipole_set;
+    std::unique_ptr<LocalSetI> local_set;
 
   public:
     Node &get_parent();
@@ -38,10 +39,12 @@ class NodeI{
     virtual void get_partition(std::vector<std::tuple<Particle*, int, int>> &partitions) const;
     void compute_interaction_list();
     unsigned int get_id() const;
+    virtual void compute_multipoles(unsigned int L) = 0;
+    virtual void collect_multipoles_to_locals();
+    virtual void propagate_locals(LocalSetI *parent_local);
   
   protected:
     static const Tensor &getMassCenter(const NodeI &_this); 
-    
     virtual void calculateMC() = 0; //mass center calculator
 
     friend class Tree;

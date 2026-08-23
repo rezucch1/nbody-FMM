@@ -8,9 +8,7 @@ class Leaf: public NodeI{
   public:
     Leaf(std::vector<std::vector<std::unique_ptr<NodeI>>> &allocator, unsigned int depth, unsigned int child_id, Particle** particles_begin,
          Particle** particles_end); //constructor
+    
+    virtual void compute_multipoles(unsigned int L) override;
   
-
-
-
-
 };

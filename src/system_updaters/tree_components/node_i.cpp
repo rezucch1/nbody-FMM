@@ -109,3 +109,19 @@ void NodeI::compute_interaction_list(){
 unsigned int NodeI::get_id() const{
   return id_child;
 }
+
+void NodeI::collect_multipoles_to_locals(){
+    auto s = interaction_list.cbegin();
+    local_set = getMultipoleSet(**s)->to_local(mass_center - getMassCenter(**s));
+
+    ++s;
+
+    for (; s < interaction_list.cend(); ++s){
+        *local_set += getMultipoleSet(**s)->to_local(mass_center - getMassCenter(**s)).get();
+    }
+}
+
+void NodeI::propagate_locals(LocalSetI *parent_local){
+    *local_set += parent_local;
+    delete parent_local;
+}
