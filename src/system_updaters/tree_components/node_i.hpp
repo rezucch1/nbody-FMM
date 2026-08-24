@@ -41,7 +41,7 @@ class NodeI{
     unsigned int get_id() const;
     virtual void compute_multipoles(unsigned int L) = 0;
     virtual void collect_multipoles_to_locals();
-    virtual void propagate_locals(LocalSetI *parent_local);
+    virtual void propagate_locals(LocalSetI *parent_local = nullptr);
   
   protected:
     static const Tensor &getMassCenter(const NodeI &_this); 

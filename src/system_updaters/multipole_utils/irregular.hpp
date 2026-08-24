@@ -2,12 +2,10 @@
 
 #include "power_set.hpp"
 
-// Equivalent to the Regular Solid Harmonics
-template<>
-class PowerSet<3> : public PowerSetI {
+class Irregular : public PowerSetI {
     
     public: 
-    PowerSet(unsigned int L, const Tensor &r);
+    Irregular(unsigned int L, const Tensor &r);
     virtual std::complex<double> operator()(unsigned l, int m=0) const override;
 
 };

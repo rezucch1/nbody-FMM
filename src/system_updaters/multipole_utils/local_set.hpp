@@ -1,3 +1,4 @@
+#pragma once
 #include "base_multipole_set_i.hpp"
 #include "math_utils/tensor.hpp"
 
@@ -15,3 +16,4 @@ class LocalSet : public LocalSetI{
 };
 
 #include "local_set2D.hpp"
+#include "local_set3D.hpp"

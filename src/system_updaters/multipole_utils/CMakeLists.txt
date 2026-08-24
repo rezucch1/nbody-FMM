@@ -7,4 +7,6 @@ add_library(multipole_utils OBJECT
     power_set2D.cpp
     power_set3D.cpp
     local_set2D.cpp
+    irregular.cpp
+    local_set3D.cpp
 )

@@ -20,6 +20,6 @@ class PowerSet : public PowerSetI{
 };
 
 #include "power_set2D.hpp"
-// #include "power_set3D.hpp" 
+#include "power_set3D.hpp" 
 
 
