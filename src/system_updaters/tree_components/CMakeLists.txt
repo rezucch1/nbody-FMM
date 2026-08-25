@@ -3,6 +3,7 @@ add_library(tree_components OBJECT
     node_i.cpp
     node.cpp
     tree.cpp
+    morton_code.cpp
 )
 
 target_include_directories(tree_components PUBLIC

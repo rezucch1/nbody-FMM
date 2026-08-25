@@ -81,16 +81,17 @@ void NodeI::compute_interaction_list(){
                     is_neighbour = false;
 
             NodeI* neighbour_node;
-            if (neighbour_id >= 0 && neighbour_id < allocator[depth].size())
+            if (neighbour_id >= 0 && neighbour_id < allocator[depth].size()){
                 neighbour_node = allocator[depth][neighbour_id].get();
-            else 
-                neighbour_node = nullptr;
+                // else 
+                //     neighbour_node = nullptr;
 
-            if (is_neighbour){
-                if (neighbour_id != id_child)
-                    neighbours_list.push_back(neighbour_node);
-            } else
-                interaction_list.push_back(neighbour_node);
+                if (is_neighbour){
+                    if (neighbour_id != id_child)
+                        neighbours_list.push_back(neighbour_node);
+                } else
+                    interaction_list.push_back(neighbour_node);
+            }
         }
 
         is_loop_ended = true;
@@ -112,6 +113,11 @@ unsigned int NodeI::get_id() const{
 
 void NodeI::collect_multipoles_to_locals(){
     auto s = interaction_list.cbegin();
+    for (; s < interaction_list.cend(); ++s);
+    if (s == interaction_list.cend()){
+        local_set = nullptr;
+        return;
+    }
     local_set = getMultipoleSet(**s)->to_local(mass_center - getMassCenter(**s));
 
     ++s;
@@ -122,6 +128,12 @@ void NodeI::collect_multipoles_to_locals(){
 }
 
 void NodeI::propagate_locals(LocalSetI *parent_local){
-    *local_set += parent_local;
-    delete parent_local;
+    if (parent_local){
+        if (local_set){
+            *local_set += parent_local;
+            delete parent_local;
+        }
+        else
+            local_set = std::unique_ptr<LocalSetI>(parent_local);
+    }
 }
