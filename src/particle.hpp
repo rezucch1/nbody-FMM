@@ -6,16 +6,17 @@ class Particle;
 class Particle{
   public:
     Particle(){};
-    Particle(double mass, Tensor &&pos, Tensor &&vel);
+    Particle(double weight, Tensor &&pos, Tensor &&vel);
 
-    const double &get_mass() const;
+    const Tensor get_acceleration(const Tensor &potential_gradiend) const;
+    double get_weight() const;
     const Tensor &get_position() const;
     const Tensor &get_velocity() const;
 
     friend class QuadratureMethod;
 
   protected:
-    double mass;
+    double weight;
     Tensor position;
     Tensor velocity;
     

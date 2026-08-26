@@ -5,10 +5,10 @@ PowerSetI::PowerSetI(unsigned int L)
 { 
 }
 
-PowerSetI &PowerSetI::operator*=(double mass)
+PowerSetI &PowerSetI::operator*=(double weight)
 {
     for(auto &el : elements){
-        el *= mass;
+        el *= weight;
     }
     return *this;
 }

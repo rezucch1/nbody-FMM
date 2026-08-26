@@ -15,11 +15,11 @@ const Tensor &NodeI::getMassCenter(const NodeI &_this)
     return _this.mass_center;
 }
 
-void NodeI::get_partition(std::vector<std::tuple<Particle *, int, int>> &partitions) const{
-    std::vector<std::tuple<Particle *, int, int>> sub_partition;
+void NodeI::get_partition(std::vector<std::tuple<const Particle *, int, int>> &partitions) const{
+    std::vector<std::tuple<const Particle *, int, int>> sub_partition;
     sub_partition.reserve(particles_end - particles_begin);
 
-    for (Particle **p = particles_begin; p < particles_end; ++p)
+    for (auto p = particles_begin; p < particles_end; ++p)
         sub_partition.push_back(std::make_tuple(*p, depth, id_child));
     
     partitions.insert(partitions.end(), sub_partition.begin(), sub_partition.end());
@@ -113,7 +113,7 @@ unsigned int NodeI::get_id() const{
 
 void NodeI::collect_multipoles_to_locals(){
     auto s = interaction_list.cbegin();
-    for (; s < interaction_list.cend(); ++s);
+    for (;*s == nullptr && s < interaction_list.cend(); ++s);
     if (s == interaction_list.cend()){
         local_set = nullptr;
         return;
@@ -122,7 +122,7 @@ void NodeI::collect_multipoles_to_locals(){
 
     ++s;
 
-    for (; s < interaction_list.cend(); ++s){
+    for (; s < interaction_list.cend(); ++s) if (*s){
         *local_set += getMultipoleSet(**s)->to_local(mass_center - getMassCenter(**s)).get();
     }
 }

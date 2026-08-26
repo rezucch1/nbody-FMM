@@ -1,7 +1,7 @@
 #include "leaf.hpp"
 #include "multipole_set.hpp"
-Leaf::Leaf(std::vector<std::vector<std::unique_ptr<NodeI>>> &allocator, unsigned int depth, unsigned int id_child, Particle** particles_begin,
-    Particle** particles_end): NodeI(allocator, depth, id_child, particles_begin, particles_end){}
+Leaf::Leaf(std::vector<std::vector<std::unique_ptr<NodeI>>> &allocator, unsigned int depth, unsigned int id_child, const Particle** particles_begin,
+    const Particle** particles_end): NodeI(allocator, depth, id_child, particles_begin, particles_end){}
 
 void Leaf::compute_multipoles(unsigned int L){
     calculateMC();
@@ -13,12 +13,26 @@ void Leaf::compute_multipoles(unsigned int L){
         std::unique_ptr<PowerSetI> z;
         if (dim == 2)
             z = std::make_unique<PowerSet<2>>(L, r);
-        // else if (r.dim == 3){
-        //     z = std::make_unique<PowerSet<3>>(L, r);
-        // }
+        else if (r.dim == 3){
+            z = std::make_unique<PowerSet<3>>(L, r);
+        }
 
-        (*z) *= (*p)->get_mass();
+        (*z) *= (*p)->get_weight();
         (*multipole_set) += *z;
+    }
+}
+
+void Leaf::get_acceleration_vector(std::vector<Tensor> &acceleration){
+    for (auto i = particles_begin; i < particles_end; ++i){
+        Tensor grad_i = - local_set->get_gradient((*i)->get_position() - mass_center);
+        for (const auto &n : neighbours_list) if (n){
+            for (auto j = ((Leaf*)n)->particles_begin; j < ((Leaf*)n)->particles_end; ++j){
+                Tensor d = (*j)->get_position() - (*i)->get_position();
+                grad_i -= (*j)->get_weight() * d / std::pow(d.squared_norm(), dim/2);
+                if (dim % 2 == 1) grad_i /= d.norm();
+            }
+        }
+        acceleration.push_back((*i)->get_acceleration(grad_i));
     }
 }
 
@@ -32,9 +46,9 @@ void Leaf::calculateMC()
     if (particles_begin == particles_end)
         return;
 
-    for(Particle** p = particles_begin; p < particles_end; p++){
-        total_mass += (*p)->get_mass();
-        mass_center += (*p)->get_mass() * (*p)->get_position();
+    for(auto p = particles_begin; p < particles_end; p++){
+        total_mass += (*p)->get_weight();
+        mass_center += (*p)->get_weight() * (*p)->get_position();
     }
     mass_center /= total_mass;
 

@@ -6,6 +6,7 @@ class LocalSetI : public BaseMultipoleSetI{
   public:
     virtual LocalSetI &operator+=(const LocalSetI *other) = 0;
     virtual LocalSetI* distribute_parent_with_distance (const Tensor &d) const=0;
+    virtual Tensor get_gradient(const Tensor &d) const=0;
   protected:
     LocalSetI(unsigned int L) : BaseMultipoleSetI(L) {};
 };

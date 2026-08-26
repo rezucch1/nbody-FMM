@@ -8,7 +8,8 @@
 #include "morton_code.hpp"
 #include "leaf.hpp"
 
-void Tree::init_tree(Particle* begin, Particle* end){
+void Tree::init_tree(const Particle *begin, const Particle *end)
+{
   particle_ordering.reserve(end - begin);
   particle_ordering.assign(end - begin, nullptr);
 
@@ -58,7 +59,7 @@ void Tree::init_tree(Particle* begin, Particle* end){
     }
   }while (max_n_particles > threshold);
 
-  Particle** leaf_begin[n_leafs + 1];
+  const Particle** leaf_begin[n_leafs + 1];
   leaf_begin[0] = particle_ordering.data();
   for (unsigned int i = 0; i < n_leafs; ++i){
     leaf_begin[i + 1] = leaf_begin[i] + p_count[i];
@@ -113,10 +114,37 @@ void Tree::init_tree(Particle* begin, Particle* end){
       if (n)
         n->compute_interaction_list();
     }
+}
+
+Tensor *Tree::get_accelerations(std::vector<Tensor> &acceleration_vector, const Particle *begin, unsigned int size){
   
   nodes_vector[0][0]->compute_multipoles(2);
   nodes_vector[0][0]->collect_multipoles_to_locals();
   nodes_vector[0][0]->propagate_locals();
+
+  {
+    std::vector<Tensor> tmp_acceleration_vector;
+    tmp_acceleration_vector.reserve(size);
+
+    for (const auto &l : *(nodes_vector.end() - 1)){
+      if (l)
+      ((Leaf*) l.get())->get_acceleration_vector(tmp_acceleration_vector);
+    }
+
+    std::vector<unsigned int> reverse_particle_ordering(size);
+    for (auto p = particle_ordering.begin(); p < particle_ordering.end(); ++p){
+      unsigned int i = p - particle_ordering.begin();
+      unsigned int pos = *p - begin;
+      reverse_particle_ordering[pos] = i;
+
+    }
+
+    acceleration_vector.reserve(size);
+    for(const auto &i : reverse_particle_ordering){
+      acceleration_vector.push_back(tmp_acceleration_vector[i]);
+    }
+  }
+  return acceleration_vector.data();
 }
 
 void Tree::print_root_multipoles(){
@@ -125,9 +153,9 @@ void Tree::print_root_multipoles(){
   std::cout << *multipole << std::endl;
 }
 
-std::vector<std::tuple<Particle *, int, int>> Tree::get_partition()
+std::vector<std::tuple<const Particle *, int, int>> Tree::get_partition()
 {
-  std::vector<std::tuple<Particle *, int, int>> partitions;
+  std::vector<std::tuple<const Particle *, int, int>> partitions;
   partitions.reserve(nodes_vector.size() * particle_ordering.size());
 
   for (unsigned int d = 0; d < nodes_vector.size(); ++d)
@@ -139,9 +167,9 @@ std::vector<std::tuple<Particle *, int, int>> Tree::get_partition()
   return partitions;
 }
 
-std::vector<std::tuple<NodeI *, NodeI *, unsigned int, char, Particle*>> Tree::get_nodes_interactions()
+std::vector<std::tuple<NodeI *, NodeI *, unsigned int, char, const Particle*>> Tree::get_nodes_interactions()
 {
-  std::vector<std::tuple<NodeI *, NodeI *, unsigned int, char, Particle*>> interaction;
+  std::vector<std::tuple<NodeI *, NodeI *, unsigned int, char, const Particle*>> interaction;
   for (int d = 0; d < nodes_vector.size(); ++d)
     for (auto &t : nodes_vector[d])if (t){
       for (auto &n : t->interaction_list) if (n)

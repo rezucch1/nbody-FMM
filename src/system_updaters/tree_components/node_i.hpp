@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include "power_set.hpp"
+#include "system_updaters/multipole_utils/power_set.hpp"
 #include "particle.hpp"
 class Node;
 // #include "node.hpp"
@@ -8,7 +8,7 @@ class Node;
 //we need an Interface, with Multipole as a subclass (same with Leaf)
 class NodeI{
   protected:
-    NodeI(std::vector<std::vector<std::unique_ptr<NodeI>>> &allocator, const unsigned int depth, unsigned int id_child, Particle** particles_begin, Particle** particles_end)
+    NodeI(std::vector<std::vector<std::unique_ptr<NodeI>>> &allocator, const unsigned int depth, unsigned int id_child, const Particle** particles_begin, const Particle** particles_end)
     : allocator(allocator)
     , depth(depth)
     , id_child(id_child)
@@ -20,8 +20,8 @@ class NodeI{
     const unsigned int depth;
     const unsigned int id_child;
 
-    Particle** const particles_begin;
-    Particle** const particles_end;
+    const Particle** const particles_begin;
+    const Particle** const particles_end;
 
     std::vector<NodeI*> neighbours_list;
     std::vector<NodeI*> interaction_list;
@@ -36,7 +36,7 @@ class NodeI{
   public:
     Node &get_parent();
     static const std::unique_ptr<MultipoleSetI> &getMultipoleSet(const NodeI &_this); 
-    virtual void get_partition(std::vector<std::tuple<Particle*, int, int>> &partitions) const;
+    virtual void get_partition(std::vector<std::tuple<const Particle*, int, int>> &partitions) const;
     void compute_interaction_list();
     unsigned int get_id() const;
     virtual void compute_multipoles(unsigned int L) = 0;
@@ -45,7 +45,7 @@ class NodeI{
   
   protected:
     static const Tensor &getMassCenter(const NodeI &_this); 
-    virtual void calculateMC() = 0; //mass center calculator
+    virtual void calculateMC() = 0; //weight center calculator
 
     friend class Tree;
 

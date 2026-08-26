@@ -82,7 +82,7 @@ int main(){
   // std::cout << "Particle ID, Mass, Possition, Velocity, Distance from center" << std::endl;
   // for (unsigned int i = 0; i < N_PARTICLES; i++){
   //   Particle p = particles[i];
-  //   std::cout << i << ", " << p.get_mass() << ", " << p.get_position() << ", " << p.get_velocity() << ", " << p.get_position().norm() << std::endl;
+  //   std::cout << i << ", " << p.get_weight() << ", " << p.get_position() << ", " << p.get_velocity() << ", " << p.get_position().norm() << std::endl;
   // }
 
   return 0;

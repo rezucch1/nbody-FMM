@@ -66,4 +66,35 @@ LocalSet<3U> *LocalSet<3U>::distribute_parent_with_distance(const Tensor &d) con
   return L;
 }
 
+Tensor LocalSet<3U>::get_gradient(const Tensor &d) const{
+  Tensor gradient{0.0, 0.0, 0.0};
+  PowerSet<3> regular(L, d);
+  double denominator = d[0]*d[0] + d[1]*d[1];
+  for (unsigned int j = 1; j <= L; ++j){
+    gradient += {
+      (*this)(j, 0).real() * regular(j, 0).real() * j * d[0] / denominator,
+      (*this)(j, 0).real() * regular(j, 0).real() * j * d[1] / denominator,
+      0.0
+    };
+    for (int k = 1; k <= j; ++k){
+      const std::complex<double> x_base = regular(j, k) * std::complex<double>(d[0] * j, -d[1] * k);
+      const std::complex<double> y_base = regular(j, k) * std::complex<double>(d[1] * j, d[0] * k);
+      gradient += {
+        (((*this)(j, -k) * std::conj(x_base)).real() + ((*this)(j, k) * x_base).real()) / denominator,
+        (((*this)(j, -k) * std::conj(y_base)).real() + ((*this)(j, k) * y_base).real()) / denominator,
+        0.0
+      };
+    }
+    for (int k = -j + 1; k <= j - 1; ++k){
+      const double z_gradient = ((*this)(j, k) * std::sqrt(j*j - k*k) * regular(j - 1, k)).real();
+      gradient += {
+        - z_gradient * d[0]*d[2] / denominator,
+        - z_gradient * d[1]*d[2] / denominator,
+        z_gradient
+      };
+    }
+  }
+  return gradient;
+}
+
 template class LocalSet<3>;

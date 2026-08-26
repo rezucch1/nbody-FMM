@@ -10,6 +10,7 @@ class LocalSet<3> : public LocalSetI{
     virtual LocalSet<3> &operator+=(const LocalSet<3> other);
     virtual LocalSet<3> *distribute_parent_with_distance(const Tensor &d) const override;
     void set_elements(unsigned int n, int m, std::complex<double>);
+    virtual Tensor get_gradient(const Tensor &d) const override;
 };
 
 

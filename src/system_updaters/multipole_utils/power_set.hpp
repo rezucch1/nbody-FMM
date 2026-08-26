@@ -11,7 +11,7 @@ class PowerSetI : public BaseMultipoleSetI{
     protected :
     PowerSetI(unsigned int L);
     public :
-    PowerSetI &operator *= (double mass);
+    PowerSetI &operator *= (double weight);
 };
 
 template<unsigned int dim>
