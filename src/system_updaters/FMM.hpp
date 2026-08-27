@@ -18,12 +18,8 @@
 class FMM : public SystemUpdateMethod {
   public:
     /**
-     * @brief Computes gravitational accelerations using Fast Multipole Method.
+     * @brief Computes gravitational accelerations using Fast Multipole Method and updates particle acceleration state.
      * @param particles System particle vector.
-     * @return Pointer to buffer of computed acceleration Tensors.
      */
-    virtual const Tensor* update(const std::vector<Particle> &particles) override;
-
-  protected:
-    std::vector<Tensor> next_acceleration; /**< Buffer storing computed acceleration Tensors. */
+    virtual void update(const std::vector<Particle> &particles) override;
 };

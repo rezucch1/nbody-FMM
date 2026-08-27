@@ -117,34 +117,16 @@ void Tree::init_tree(const Particle *begin, const Particle *end)
     }
 }
 
-Tensor *Tree::get_accelerations(std::vector<Tensor> &acceleration_vector, const Particle *begin, unsigned int size){
+void Tree::compute_accelerations(){
   
   nodes_vector[0][0]->compute_multipoles(2);
   nodes_vector[0][0]->collect_multipoles_to_locals();
   nodes_vector[0][0]->propagate_locals();
 
-  {
-    std::vector<Tensor> tmp_acceleration_vector;
-    tmp_acceleration_vector.reserve(size);
-
-    for (const auto &l : *(nodes_vector.end() - 1)){
-      if (l)
-      ((Leaf*) l.get())->get_acceleration_vector(tmp_acceleration_vector);
-    }
-
-    std::vector<unsigned int> reverse_particle_ordering(size);
-    for (auto p = particle_ordering.begin(); p < particle_ordering.end(); ++p){
-      unsigned int i = p - particle_ordering.begin();
-      unsigned int pos = *p - begin;
-      reverse_particle_ordering[pos] = i;
-    }
-
-    acceleration_vector.reserve(size);
-    for(const auto &i : reverse_particle_ordering){
-      acceleration_vector.push_back(tmp_acceleration_vector[i]);
-    }
+  for (const auto &l : *(nodes_vector.end() - 1)){
+    if (l)
+    ((Leaf*) l.get())->compute_acceleration();
   }
-  return acceleration_vector.data();
 }
 
 void Tree::print_root_multipoles(){

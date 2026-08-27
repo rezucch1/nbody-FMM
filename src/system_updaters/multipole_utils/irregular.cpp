@@ -14,13 +14,10 @@ Irregular::Irregular(unsigned int L, const Tensor &r)
     double r_squarenorm = r[0]*r[0] + r[1]*r[1] + r[2]*r[2]; 
 
     elements[0] = 1/std::sqrt(r_squarenorm);
-    elements[1]=r[2] / r_squarenorm;
-    elements[2]=r[0] / r_squarenorm;
-    elements[3]=r[1] / r_squarenorm;
-    int i = 4;
+    int i = 1;
     double mul_factor;
 
-    for (int l=2; l<L+1; l++){
+    for (int l=1; l<L+1; l++){
         for (int m=0; m<l-1; m++){
             mul_factor = 1 / (r_squarenorm * std::sqrt(l*l * m*m));
             elements[i] = mul_factor * (r[2]*(2*l-1)*elements[i - 2*l + 1] - elements[i - 4*(l+1)]);

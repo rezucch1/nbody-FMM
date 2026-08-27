@@ -23,9 +23,8 @@ constexpr double GRAV_CONST = 6.6743e-11;
 class SystemUpdateMethod {
   public:
     /**
-     * @brief Computes acceleration vectors for a list of particles.
+     * @brief Computes acceleration vectors and updates internal particle acceleration state.
      * @param particles Const reference to vector of system particles.
-     * @return Pointer to contiguous buffer/vector of computed acceleration Tensors.
      */
-    virtual const Tensor* update(const std::vector<Particle> &particles) = 0;
+    virtual void update(const std::vector<Particle> &particles) = 0;
 };

@@ -10,7 +10,7 @@ class Particle;
 
 /**
  * @class Particle
- * @brief Class representing a point particle with mass/weight, position, and velocity vectors.
+ * @brief Class representing a point particle with mass/weight, position, velocity, and acceleration vectors.
  */
 class Particle {
   public:
@@ -21,19 +21,25 @@ class Particle {
 
     /**
      * @brief Constructs a Particle with given weight/mass, position, and velocity.
-     * @param weight Mass or weight parameter \$ m_i \$.
-     * @param pos Position vector \$ \mathbf{x}_i \$.
-     * @param vel Velocity vector \$ \mathbf{v}_i \$.
+     * @param weight Mass or weight parameter \f$ m_i \f$.
+     * @param pos Position vector \f$ \mathbf{x}_i \f$.
+     * @param vel Velocity vector \f$ \mathbf{v}_i \f$.
      */
     Particle(double weight, Tensor &&pos, Tensor &&vel);
 
     /**
-     * @brief Calculates gravitational acceleration from potential gradient.
-     * \$[ \mathbf{a}_i = -\nabla \Phi(\mathbf{x}_i) \$]
+     * @brief Calculates and updates gravitational acceleration from potential gradient.
+     * \f[ \mathbf{a}_i = - G \nabla \Phi(\mathbf{x}_i) \f]
      * @param potential_gradiend Evaluated potential gradient vector \f$ \nabla \Phi \f$.
-     * @return Acceleration vector \$ \mathbf{a}_i \$.
+     * @return Const reference to updated acceleration vector \f$ \mathbf{a}_i \f$.
      */
-    const Tensor get_acceleration(const Tensor &potential_gradiend) const;
+    const Tensor &compute_new_accelaration(const Tensor &potential_gradiend) const;
+
+    /**
+     * @brief Gets const reference to particle acceleration vector.
+     * @return Acceleration vector \f$ \mathbf{a}_i \f$.
+     */
+    const Tensor &get_acceleration() const;
 
     /**
      * @brief Gets particle mass/weight.
@@ -56,7 +62,8 @@ class Particle {
     friend class QuadratureMethod;
 
   protected:
-    double weight;   /**Particle mass or weight parameter. */
-    Tensor position; /**Spatial position vector. */
-    Tensor velocity; /**Spatial velocity vector. */
+    double weight;               /**< Particle mass or weight parameter. */
+    Tensor position;             /**< Spatial position vector. */
+    Tensor velocity;             /**< Spatial velocity vector. */
+    mutable Tensor acceleration; /**< Particle acceleration vector. */
 };

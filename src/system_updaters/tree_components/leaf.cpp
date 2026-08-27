@@ -28,7 +28,7 @@ void Leaf::compute_multipoles(unsigned int L){
     }
 }
 
-void Leaf::get_acceleration_vector(std::vector<Tensor> &acceleration){
+void Leaf::compute_acceleration(){
     for (auto i = particles_begin; i < particles_end; ++i){
         Tensor grad_i = - local_set->get_gradient((*i)->get_position() - mass_center);
         for (const auto &n : neighbours_list) if (n){
@@ -38,7 +38,6 @@ void Leaf::get_acceleration_vector(std::vector<Tensor> &acceleration){
                 if (dim % 2 == 1) grad_i /= d.norm();
             }
         }
-        acceleration.push_back((*i)->get_acceleration(grad_i));
     }
 }
 

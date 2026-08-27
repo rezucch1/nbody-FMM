@@ -11,15 +11,12 @@ PowerSet<3>::PowerSet(unsigned int L, const Tensor &r)
 {
     elements.reserve((L+1)*(L+1));
     elements[0] = 1;
-    elements[1]=r[2];
-    elements[2]=r[0];
-    elements[3]=r[1];
 
     double r_squarenorm = r[0]*r[0] + r[1]*r[1] + r[2]*r[2]; 
-    int i = 4;
+    int i = 1;
     double mul_factor;
 
-    for (int l=2; l<L+1; l++){
+    for (int l=1; l<=L; l++){
         for (int m=0; m<l-1; m++){
             mul_factor = 1 / std::sqrt(l*l * m*m);
             elements[i] = mul_factor * (r[2]*(2*l-1)*elements[i - 2*l + 1] - r_squarenorm * elements[i - 4*(l+1)]);

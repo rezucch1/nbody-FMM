@@ -17,7 +17,6 @@ void RungeKutta4::integrate(SystemUpdateMethod *method, std::vector<Particle> &p
   std::vector<Particle> particles_k;
   particles_k.reserve(particles.size());
 
-  const Tensor* acceleration_k;
   std::unique_ptr<Tensor[]> velocity_k = std::make_unique<Tensor[]>(particles.size());
 
   // stage 1
@@ -27,9 +26,9 @@ void RungeKutta4::integrate(SystemUpdateMethod *method, std::vector<Particle> &p
     velocity_k[i] = particles[i].get_velocity();
   }
 
-  acceleration_k = method->update(particles_k);
+  method->update(particles_k);
   for (unsigned int i = 0; i < particles.size(); ++i){
-    accelerations_sum[i] = acceleration_k[i];
+    accelerations_sum[i] = particles_k[i].get_acceleration();
     assert(!std::isnan(accelerations_sum[i].squared_norm()));
     velocity_sum[i] = velocity_k[i];
     assert(&velocity_sum[i] != &velocity(particles[i]));
@@ -42,12 +41,12 @@ void RungeKutta4::integrate(SystemUpdateMethod *method, std::vector<Particle> &p
   }
 
   for (unsigned int i = 0; i < particles.size(); ++i){
-    velocity_k[i] = particles[i].get_velocity() + delta_t / 2 * acceleration_k[i];
+    velocity_k[i] = particles[i].get_velocity() + delta_t / 2 * particles_k[i].get_acceleration();
   }
 
-  acceleration_k = method->update(particles_k);
+  method->update(particles_k);
   for (unsigned int i = 0; i < particles.size(); ++i){
-    accelerations_sum[i] += 2*acceleration_k[i];
+    accelerations_sum[i] += 2*particles_k[i].get_acceleration();
     velocity_sum[i] += 2*velocity_k[i];
   }
 
@@ -58,12 +57,12 @@ void RungeKutta4::integrate(SystemUpdateMethod *method, std::vector<Particle> &p
   }
 
   for (unsigned int i = 0; i < particles.size(); ++i){
-    velocity_k[i] = particles[i].get_velocity() + delta_t / 2 * acceleration_k[i];
+    velocity_k[i] = particles[i].get_velocity() + delta_t / 2 * particles_k[i].get_acceleration();
   }
 
-  acceleration_k = method->update(particles_k);
+  method->update(particles_k);
   for (unsigned int i = 0; i < particles.size(); ++i){
-    accelerations_sum[i] += 2*acceleration_k[i];
+    accelerations_sum[i] += 2*particles_k[i].get_acceleration();
     velocity_sum[i] += 2*velocity_k[i];
   }
 
@@ -73,13 +72,13 @@ void RungeKutta4::integrate(SystemUpdateMethod *method, std::vector<Particle> &p
     position(particles_k[i]) += delta_t * velocity_k[i];
   }
   for (unsigned int i = 0; i < particles.size(); ++i){
-    velocity_k[i] = particles[i].get_velocity() + delta_t * acceleration_k[i];
+    velocity_k[i] = particles[i].get_velocity() + delta_t * particles_k[i].get_acceleration();
   }
 
-  acceleration_k = method->update(particles_k);
+  method->update(particles_k);
 
   for (unsigned int i = 0; i < particles.size(); ++i){
-    accelerations_sum[i] += acceleration_k[i];
+    accelerations_sum[i] += particles_k[i].get_acceleration();
     velocity_sum[i] += velocity_k[i];
   }
 

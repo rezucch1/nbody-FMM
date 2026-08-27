@@ -18,12 +18,8 @@
 class NaiveUpdate : public SystemUpdateMethod {
   public:
     /**
-     * @brief Computes exact \f$ \mathcal{O}(N^2) \f$ accelerations for all particles.
+     * @brief Computes exact \f$ \mathcal{O}(N^2) \f$ accelerations for all particles and updates particle acceleration state.
      * @param particles System particle vector.
-     * @return Pointer to buffer of computed acceleration Tensors.
      */
-    virtual const Tensor* update(const std::vector<Particle> &particles) override;
-
-  protected:
-    std::vector<Tensor> next_acceleration; /**< Buffer storing computed acceleration Tensors. */
+    virtual void update(const std::vector<Particle> &particles) override;
 };

@@ -11,8 +11,13 @@ Particle::Particle(double weight, Tensor &&pos, Tensor &&vel)
 	, velocity(vel)
 	{}
 
-const Tensor Particle::get_acceleration(const Tensor &potential_gradiend) const{
-  return - GRAV_CONST * potential_gradiend;
+const Tensor &Particle::compute_new_accelaration(const Tensor &potential_gradiend) const{
+  acceleration = - GRAV_CONST * potential_gradiend;
+  return acceleration;
+}
+
+const Tensor &Particle::get_acceleration() const {
+  return acceleration;
 }
 
 double Particle::get_weight() const

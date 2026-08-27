@@ -26,13 +26,9 @@ class Tree {
     Tree(InputIt begin, InputIt end) { init_tree(&*begin, &*end); };
 
     /**
-     * @brief Computes gravitational acceleration vectors for all particles using FMM.
-     * @param acceleration_vector Reference to vector storing computed accelerations.
-     * @param begin Pointer to start of original particle array.
-     * @param size Total number of particles.
-     * @return Raw pointer to acceleration vector buffer.
+     * @brief Computes gravitational acceleration vectors for all particles using FMM passes and updates particle acceleration state.
      */
-    Tensor* get_accelerations(std::vector<Tensor> &acceleration_vector, const Particle* begin, unsigned int size);
+    void compute_accelerations();
 
   protected:
     std::vector<const Particle*> particle_ordering;                 /**< Array of particle pointers sorted by Morton code. */

@@ -51,5 +51,5 @@ class Leaf : public NodeI {
      * Combines far-field local potential expansion gradient with near-field direct particle-particle interactions from neighbor nodes.
      * @param acceleration Output acceleration vector list.
      */
-    void get_acceleration_vector(std::vector<Tensor> &acceleration);
+    void compute_acceleration();
 };
