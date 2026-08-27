@@ -30,7 +30,7 @@ void Leaf::compute_multipoles(unsigned int L){
 
 void Leaf::compute_acceleration(){
     for (auto i = particles_begin; i < particles_end; ++i){
-        Tensor grad_i = - local_set->get_gradient((*i)->get_position() - mass_center);
+        Tensor grad_i = local_set->get_gradient((*i)->get_position() - mass_center);
         for (const auto &n : neighbours_list) if (n){
             for (auto j = ((Leaf*)n)->particles_begin; j < ((Leaf*)n)->particles_end; ++j){
                 Tensor d = (*j)->get_position() - (*i)->get_position();
@@ -38,6 +38,7 @@ void Leaf::compute_acceleration(){
                 if (dim % 2 == 1) grad_i /= d.norm();
             }
         }
+        i->compute_new_accelaration(grad_i);
     }
 }
 
