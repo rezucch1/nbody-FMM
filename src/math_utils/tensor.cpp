@@ -1,3 +1,8 @@
+/**
+ * @file tensor.cpp
+ * @brief Implementation of N-dimensional Tensor class and linear algebra operations.
+ */
+
 #include "tensor.hpp"
 #include <cstring>
 #include <iostream>
@@ -153,7 +158,7 @@ std::ostream &operator<<(std::ostream &stream, const Tensor &&vect){
 }
 
 double Tensor::squared_norm() const{
-  double res;
+  double res = 0.0;
   for (size_t i = 0; i < dim; ++i){
     double value = data[i];
     res += value * value;

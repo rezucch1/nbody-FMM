@@ -1,3 +1,8 @@
+/**
+ * @file morton_code.cpp
+ * @brief Implementation of Morton Z-order curve bit interleaving operations.
+ */
+
 #include "morton_code.hpp"
 #include <cstring>
 
@@ -21,11 +26,11 @@ void Morton::decode(unsigned int *cartesian_coordinates, unsigned int dim, unsig
     cartesian_coordinates[i] = 0;
 
   unsigned int digit = 0;
-    while (code > 0){
-      for (unsigned int i = 0; i < dim; ++i){
-        cartesian_coordinates[i] += (code % 2) << digit;
-        code /= 2;
-      }
-      ++digit;
+  while (code > 0){
+    for (unsigned int i = 0; i < dim; ++i){
+      cartesian_coordinates[i] += (code % 2) << digit;
+      code /= 2;
     }
+    ++digit;
+  }
 }

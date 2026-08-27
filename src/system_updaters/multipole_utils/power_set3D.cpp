@@ -1,5 +1,10 @@
-#include "power_set3D.hpp"
+/**
+ * @file power_set3D.cpp
+ * @brief Implementation of 3D PowerSet regular solid harmonics evaluation.
+ */
 
+#include "power_set3D.hpp"
+#include <cmath>
 
 PowerSet<3>::PowerSet(unsigned int L, const Tensor &r)
 : PowerSetI(L)
@@ -35,14 +40,12 @@ PowerSet<3>::PowerSet(unsigned int L, const Tensor &r)
         elements[i] = mul_factor * (r[0]*elements[i-2*l-1] + r[1]*elements[i-2*l]);
         elements[i+1] = mul_factor * (r[0]*elements[i-2*l] - r[1]*elements[i-2*l-1]);
         i = i+2;        
-
     }
-
 }
 
 std::complex<double> PowerSet<3>::operator()(unsigned l, int m) const
 {
-    if (m = 0)
+    if (m == 0)
         return std::complex<double>(elements[l*l], 0);
     else if (m < 0)
         return std::complex<double>(elements[l*l + 2*m - 1], elements[l*l + 2*m]);

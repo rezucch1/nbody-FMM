@@ -1,3 +1,8 @@
+/**
+ * @file multipole_set3D.cpp
+ * @brief Implementation of 3D MultipoleSet methods, 3D M2M translation, and 3D M2L conversion.
+ */
+
 #include "multipole_set3D.hpp"
 #include "irregular.hpp"
 
@@ -103,7 +108,6 @@ std::unique_ptr<LocalSetI> MultipoleSet<3U>::to_local(const Tensor &d) const{
                     l_complex += (double)sign * (*this)(n, m) * imaginary_power[(4 + (std::abs(k - m) - std::abs(k) - std::abs(m)) % 4) % 4] * A * irregular(j+n, k-m);
                 }
             }
-            const unsigned int idx = 2*j*j + 2*j + 2*k + 2;
             L->set_elements(j, k, l_complex);
         }
     }

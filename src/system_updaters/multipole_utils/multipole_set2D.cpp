@@ -1,5 +1,9 @@
-#include "multipole_set2D.hpp"
+/**
+ * @file multipole_set2D.cpp
+ * @brief Implementation of 2D MultipoleSet M2M shifts and M2L conversion to local expansions.
+ */
 
+#include "multipole_set2D.hpp"
 
 MultipoleSet<2>::MultipoleSet(unsigned int L)
 : MultipoleSetI(L)
@@ -13,8 +17,6 @@ std::complex<double> MultipoleSet<2>::operator()(unsigned l, int m) const
     return std::complex<double>(elements[2*l-1], elements[2*l]);
 }
 
-// Returns
-// $ \sum{k=0, l}\bin{l, k} d^k M^{children}_{l-k}}$
 std::unique_ptr<MultipoleSetI> MultipoleSet<2>::weigh_children_with_distance(const Tensor &d) const
 {
     std::unique_ptr<MultipoleSet<2>> M = std::make_unique<MultipoleSet<2>>(L);
@@ -71,7 +73,6 @@ std::unique_ptr<LocalSetI> MultipoleSet<2>::to_local(const Tensor &d) const{
     }
 
     return local;
-
 }
 
 template class MultipoleSet<2>;

@@ -1,3 +1,8 @@
+/**
+ * @file particle.cpp
+ * @brief Implementation of Particle methods.
+ */
+
 #include "particle.hpp"
 
 Particle::Particle(double weight, Tensor &&pos, Tensor &&vel)

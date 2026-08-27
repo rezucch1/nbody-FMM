@@ -1,5 +1,11 @@
+/**
+ * @file leaf.cpp
+ * @brief Implementation of Leaf node P2M and acceleration evaluation methods.
+ */
+
 #include "leaf.hpp"
 #include "multipole_set.hpp"
+
 Leaf::Leaf(std::vector<std::vector<std::unique_ptr<NodeI>>> &allocator, unsigned int depth, unsigned int id_child, const Particle** particles_begin,
     const Particle** particles_end): NodeI(allocator, depth, id_child, particles_begin, particles_end){}
 

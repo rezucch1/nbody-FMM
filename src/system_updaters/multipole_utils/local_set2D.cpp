@@ -1,6 +1,10 @@
+/**
+ * @file local_set2D.cpp
+ * @brief Implementation of 2D LocalSet methods, L2L translation, and 2D potential gradient evaluation.
+ */
+
 #include "local_set.hpp"
 #include "local_set2D.hpp"
-
 
 inline LocalSet<2>::LocalSet(unsigned int L) : LocalSetI(L){
   elements.reserve(L + 1);
@@ -15,8 +19,6 @@ std::complex<double> &LocalSet<2>::get_element(unsigned int i)
 {
   return elements[i];
 }
-
-
 
 const std::complex<double> &LocalSet<2>::get_element(unsigned int i) const{
   return elements[i];

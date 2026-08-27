@@ -1,3 +1,8 @@
+/**
+ * @file multipole_set.cpp
+ * @brief Implementation of MultipoleSetI base operators.
+ */
+
 #include "multipole_set.hpp"
 
 MultipoleSetI::MultipoleSetI(unsigned int L)
@@ -8,7 +13,7 @@ MultipoleSetI::MultipoleSetI(unsigned int L)
 
 MultipoleSetI &MultipoleSetI::operator+=(const PowerSetI &z)
 {
-    for(int i=0; i<elements.size(); ++i){
+    for(size_t i=0; i<elements.size(); ++i){
         this->elements[i] += z.elements[i];
     }
     return *this;
@@ -16,8 +21,7 @@ MultipoleSetI &MultipoleSetI::operator+=(const PowerSetI &z)
 
 MultipoleSetI &MultipoleSetI::operator+=(const MultipoleSetI &z)
 {
-    
-    for(int i=0; i<elements.size(); ++i){
+    for(size_t i=0; i<elements.size(); ++i){
         this->elements[i] += z.elements[i];
     }
     return *this;
@@ -25,7 +29,7 @@ MultipoleSetI &MultipoleSetI::operator+=(const MultipoleSetI &z)
 
 MultipoleSetI &MultipoleSetI::operator=(std::nullptr_t)
 {
-    int i = 0;
+    size_t i = 0;
     for (; i < elements.size(); ++i)
         elements[i] = 0.0;
     for (; i < elements.capacity(); ++i)
@@ -39,5 +43,5 @@ const std::vector<double> &MultipoleSetI::getElements(const MultipoleSetI &_this
 }
 
 std::ostream &operator<< (std::ostream &os, const MultipoleSetI &multipole){
-    // return multipole.output_to_stream(os);
+    return os;
 }

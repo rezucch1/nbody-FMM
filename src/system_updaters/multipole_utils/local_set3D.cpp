@@ -1,3 +1,8 @@
+/**
+ * @file local_set3D.cpp
+ * @brief Implementation of 3D LocalSet methods, 3D L2L translation, and 3D potential gradient evaluation.
+ */
+
 #include "local_set3D.hpp"
 #include "power_set3D.hpp"
 
@@ -59,7 +64,6 @@ LocalSet<3U> *LocalSet<3U>::distribute_parent_with_distance(const Tensor &d) con
           l_complex += (double)sign * (*this)(n, m) * imaginary_power[(4 + (std::abs(m) - std::abs(m - k) - std::abs(k)) % 4) % 4] * A * regular(n - j, k - m);
         }
       }
-      const unsigned int idx = 2*j*j + 2*j + 2*k + 2;
       L->set_elements(j, k, l_complex);
     }
   }
@@ -81,7 +85,7 @@ Tensor LocalSet<3U>::get_gradient(const Tensor &d) const{
       const std::complex<double> y_base = regular(j, k) * std::complex<double>(d[1] * j, d[0] * k);
       gradient += {
         (((*this)(j, -k) * std::conj(x_base)).real() + ((*this)(j, k) * x_base).real()) / denominator,
-        (((*this)(j, -k) * std::conj(y_base)).real() + ((*this)(j, k) * y_base).real()) / denominator,
+        (((*this)(j, -k) * std::conj(y_base)).real() + ((*this)(j, k) * x_base).real()) / denominator,
         0.0
       };
     }

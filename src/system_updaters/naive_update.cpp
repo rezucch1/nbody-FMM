@@ -1,3 +1,8 @@
+/**
+ * @file naive_update.cpp
+ * @brief Implementation of direct O(N^2) gravitational acceleration solver.
+ */
+
 #include "naive_update.hpp"
 #include <cmath>
 

@@ -1,8 +1,12 @@
+/**
+ * @file tree.cpp
+ * @brief Implementation of Tree spatial partitioning, Morton index sorting, and FMM pass orchestration.
+ */
+
 #include "tree.hpp"
 #include <tuple>
 #include <iterator>
 #include <bit>
-
 #include <iostream>
 
 #include "morton_code.hpp"
@@ -106,9 +110,6 @@ void Tree::init_tree(const Particle *begin, const Particle *end)
     }
   }
 
-  // auto &root = nodes_vector.emplace_back(1);
-  // nodes_vector[0][0] = std::make_unique<Node>(nodes_vector, 0, 0, &*particle_ordering.begin(), &*particle_ordering.end(), a, b);
-
   for (auto &d : nodes_vector)
     for (auto &n : d){
       if (n)
@@ -136,7 +137,6 @@ Tensor *Tree::get_accelerations(std::vector<Tensor> &acceleration_vector, const 
       unsigned int i = p - particle_ordering.begin();
       unsigned int pos = *p - begin;
       reverse_particle_ordering[pos] = i;
-
     }
 
     acceleration_vector.reserve(size);

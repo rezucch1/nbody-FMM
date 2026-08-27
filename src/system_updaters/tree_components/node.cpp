@@ -1,15 +1,16 @@
+/**
+ * @file node.cpp
+ * @brief Implementation of internal Node class methods.
+ */
+
 #include "node.hpp"
 #include "leaf.hpp"
 constexpr unsigned int threshold = 5;
 
-Node::Node(std::vector<std::vector<std::unique_ptr<NodeI>>> &allocator, unsigned int depth, unsigned int id_child, const Particle** particles_begin, const Particle** particles_end /*, const Tensor &a, const Tensor &b*/)
+Node::Node(std::vector<std::vector<std::unique_ptr<NodeI>>> &allocator, unsigned int depth, unsigned int id_child, const Particle** particles_begin, const Particle** particles_end)
     : NodeI(allocator, depth, id_child ,particles_begin, particles_end)
 {
 }
-
-// const std::vector<std::unique_ptr<NodeI>> &Node::get_children() const{
-//   return children;
-// }
 
 void Node::compute_multipoles(unsigned int L){
 

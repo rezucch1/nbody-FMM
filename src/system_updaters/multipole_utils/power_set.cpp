@@ -1,3 +1,8 @@
+/**
+ * @file power_set.cpp
+ * @brief Implementation of PowerSetI constructor and scalar scaling operator.
+ */
+
 #include "power_set.hpp"
 
 PowerSetI::PowerSetI(unsigned int L)

@@ -1,3 +1,8 @@
+/**
+ * @file node_i.cpp
+ * @brief Implementation of NodeI base methods, Morton interaction arithmetic, M2L collection, and L2L propagation.
+ */
+
 #include "node_i.hpp"
 #include "node.hpp"
 
@@ -83,9 +88,6 @@ void NodeI::compute_interaction_list(){
             NodeI* neighbour_node;
             if (neighbour_id >= 0 && neighbour_id < allocator[depth].size()){
                 neighbour_node = allocator[depth][neighbour_id].get();
-                // else 
-                //     neighbour_node = nullptr;
-
                 if (is_neighbour){
                     if (neighbour_id != id_child)
                         neighbours_list.push_back(neighbour_node);
@@ -104,7 +106,6 @@ void NodeI::compute_interaction_list(){
             }
         }
     }while (!is_loop_ended);
-    
 }
 
 unsigned int NodeI::get_id() const{

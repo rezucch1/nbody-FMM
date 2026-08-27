@@ -1,3 +1,8 @@
+/**
+ * @file FMM.cpp
+ * @brief Implementation of Fast Multipole Method (FMM) update solver.
+ */
+
 #include "FMM.hpp"
 #include "tree_components/tree.hpp"
 
