@@ -14,11 +14,13 @@ constexpr std::complex<double> imaginary_power[] = {
 };
 
 inline LocalSet<3>::LocalSet(unsigned int L) : LocalSetI(L){
-  elements.reserve(2*L*L + 4*L + 1);
+  unsigned int size = 2*L*L + 4*L + 2;
+  elements.reserve(size);
+  elements.assign(size, 0.0);
 }
 
 std::complex<double> LocalSet<3U>::operator()(unsigned int l, int m) const{
-  unsigned int idx = 2*l*l + 2*l + 2*m + 2;
+  unsigned int idx = 2*l*l + 2*l + 2*m;
   return std::complex<double>(elements[idx], elements[idx + 1]);
 }
 
@@ -34,14 +36,14 @@ LocalSet<3> &LocalSet<3>::operator+=(const LocalSet<3> other){
 }
 
 void LocalSet<3>::set_elements(unsigned int n, int m, std::complex<double> l){
-  unsigned int idx = 2*n*n + 2*n + 2*m + 2;
+  unsigned int idx = 2*n*n + 2*n + 2*m;
   elements[idx] = l.real();
   elements[idx + 1] = l.imag();
 }
 
 LocalSet<3U> *LocalSet<3U>::distribute_parent_with_distance(const Tensor &d) const{
   auto L = new LocalSet<3>(this->L);
-  L = 0;
+  // *L = 0;
   const auto regular = PowerSet<3>(2 * this->L, d);
 
   for (unsigned int j = 0; j <= this->L; ++j){

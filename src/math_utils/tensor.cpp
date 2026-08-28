@@ -11,36 +11,49 @@
 
 Tensor::Tensor(size_t dim)
   : dim(dim)
-  , data(new double[dim])
-  {}
+  {
+    data.reserve(dim);
+    data.assign(dim, 0.0);
+  }
 
 Tensor::Tensor(){}
 
 Tensor::Tensor(std::initializer_list<double> init) : Tensor(init.size()){
-  std::memcpy(data.get(), init.begin(), sizeof(double) * dim);
+  std::memcpy(data.data(), init.begin(), sizeof(double) * dim);
 }
 
 Tensor::Tensor(const Tensor &other) noexcept : Tensor(other.dim){
-  std::memcpy(this->data.get(), other.data.get(), sizeof(double) * dim);
+  std::memcpy(this->data.data(), other.data.data(), sizeof(double) * dim);
 }
 
 Tensor::Tensor(Tensor &&other) noexcept
   : dim(other.dim)
-  , data(other.data.release())
+  , data(other.data)
   {}
 
 Tensor &Tensor::operator=(const Tensor &other){
   this->dim = other.dim;
-  data = std::unique_ptr<double[]>(new double[dim]);
-  std::memcpy(data.get(), other.data.get(), sizeof(double) * dim);
+  data.reserve(dim);
+  std::memcpy(data.data(), other.data.data(), sizeof(double) * dim);
   return *this;
 }
 
 Tensor &Tensor::operator=(const Tensor &&other){
-  return *this = other;
+  this->dim = other.dim;
+  this->data.assign(other.data.begin(), other.data.end());
+  return *this;
 }
 
-double &Tensor::operator[](size_t idx) const{
+const double &Tensor::operator[](size_t idx) const{
+  if (idx >= dim){
+    std::cerr << "You have access outside the dimention of the tensor" << std::endl;
+    std::exit(1);
+  }
+
+  return data[idx];
+}
+
+double &Tensor::operator[](size_t idx){
   if (idx >= dim){
     std::cerr << "You have access outside the dimention of the tensor" << std::endl;
     std::exit(1);
@@ -140,7 +153,7 @@ Tensor Tensor::operator/(double scalar) const{
 bool Tensor::operator==(const Tensor &other) const{
   if (this->dim != other.dim)
     return false;
-  return memcmp(this->data.get(), other.data.get(), this->dim * sizeof(double)) == 0;
+  return memcmp(this->data.data(), other.data.data(), this->dim * sizeof(double)) == 0;
 }
 
 std::ostream &operator<<(std::ostream &stream, const Tensor &vect){

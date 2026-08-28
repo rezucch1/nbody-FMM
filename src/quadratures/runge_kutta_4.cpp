@@ -9,15 +9,18 @@
 
 void RungeKutta4::integrate(SystemUpdateMethod *method, std::vector<Particle> &particles, const double &delta_t){
   // a_k1 + 2a_k2 + 2a_k3 + a_k4
-  std::unique_ptr<Tensor[]> accelerations_sum = std::make_unique<Tensor[]>(particles.size());
+  std::vector<Tensor> accelerations_sum;
+  accelerations_sum.reserve(particles.size());
 
   // v_k1 + 2v_k2 + 2v_k3 + v_k4
-  std::unique_ptr<Tensor[]> velocity_sum = std::make_unique<Tensor[]>(particles.size());
+  std::vector<Tensor> velocity_sum;
+  velocity_sum.reserve(particles.size());
 
   std::vector<Particle> particles_k;
   particles_k.reserve(particles.size());
 
-  std::unique_ptr<Tensor[]> velocity_k = std::make_unique<Tensor[]>(particles.size());
+  std::vector<Tensor> velocity_k;
+  velocity_k.reserve(particles.size());
 
   // stage 1
   std::copy(particles.begin(), particles.end(), std::back_inserter(particles_k));

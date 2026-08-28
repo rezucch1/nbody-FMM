@@ -1,5 +1,5 @@
 #pragma once
-#include <memory>
+#include <vector>
 #include <initializer_list>
 #include <ostream>
 
@@ -65,7 +65,10 @@ class Tensor {
      * @param idx Index of element (0 to dim-1).
      * @return Reference to element.
      */
-    double &operator[](size_t idx) const;
+    const double &operator[](size_t idx) const;
+
+
+    double &operator[](size_t idx);
 
     /**
      * @brief Vector addition (const reference).
@@ -187,7 +190,7 @@ class Tensor {
     size_t dim; /**< Dimension of the tensor vector space. */
 
   protected:
-    std::unique_ptr<double[]> data; /**< Dynamic array storing vector components. */
+    std::vector<double> data; /**< Dynamic array storing vector components. */
 };
 
 /**

@@ -1,0 +1,83 @@
+Bootstrap: docker
+From: ubuntu:24.04
+
+%labels
+    Author Antigravity AI
+    Description Ubuntu 24.04 Apptainer container for N-Body Fast Multipole Method (FMM) with C++20, OpenMPI, and parallel HDF5.
+    Version 1.2
+
+%help
+    This container provides a modern C++20 development and execution environment configured with:
+    - GCC 13+ compiler with full C++20 support (-std=c++20)
+    - GDB debugger
+    - CMake 3.28+ and Ninja build systems
+    - OpenMPI development libraries and binaries (mpic++, mpirun)
+    - Parallel HDF5 libraries (libhdf5-openmpi-dev, h5pcc)
+
+    Usage:
+      Build image:
+        singularity build --fakeroot build/nbody.sif Apptainer.def
+
+      Run build/simulation:
+        singularity exec build/nbody.sif cmake -B build -G Ninja
+        singularity exec build/nbody.sif cmake --build build
+        singularity exec build/nbody.sif mpirun -np 4 ./build/main
+
+%environment
+    export CC=gcc
+    export CXX=g++
+    export MPICC=mpicc
+    export MPICXX=mpic++
+    export CXXFLAGS="-O3 -std=c++20"
+    export HDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi
+    export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/hdf5/openmpi:$LD_LIBRARY_PATH
+    export PATH=/usr/lib/x86_64-linux-gnu/hdf5/openmpi/bin:/usr/lib/x86_64-linux-gnu/hdf5/openmpi:$PATH
+
+%post
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        g++ \
+        gcc \
+        gdb \
+        gfortran \
+        cmake \
+        ninja-build \
+        make \
+        pkg-config \
+        git \
+        ca-certificates \
+        openmpi-bin \
+        libopenmpi-dev \
+        libhdf5-dev \
+        libhdf5-openmpi-dev \
+        hdf5-tools \
+        python3 \
+        python3-pip \
+        python3-pandas \
+        python3-matplotlib \
+        locales
+
+    # Configure locale
+    locale-gen en_US.UTF-8
+    update-locale LANG=en_US.UTF-8
+
+    # Clean up apt cache to reduce image size
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+%test
+    export PATH=/usr/lib/x86_64-linux-gnu/hdf5/openmpi/bin:$PATH
+    export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/hdf5/openmpi:$LD_LIBRARY_PATH
+
+    echo "=== Verifying C++20 Compiler & GDB ==="
+    g++ --version
+    gdb --version
+    g++ -std=c++20 -dM -E - < /dev/null | grep __cplusplus
+
+    echo "=== Verifying OpenMPI ==="
+    mpic++ --version
+    mpirun --version
+
+    echo "=== Verifying HDF5 (Serial & Parallel versions) ==="
+    h5cc -showconfig || h5pcc -showconfig || h5pcc.openmpi -showconfig

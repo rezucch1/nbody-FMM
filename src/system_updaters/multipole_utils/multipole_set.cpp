@@ -29,11 +29,12 @@ MultipoleSetI &MultipoleSetI::operator+=(const MultipoleSetI &z)
 
 MultipoleSetI &MultipoleSetI::operator=(std::nullptr_t)
 {
-    size_t i = 0;
-    for (; i < elements.size(); ++i)
-        elements[i] = 0.0;
-    for (; i < elements.capacity(); ++i)
-        elements.push_back(0.0);
+    elements.assign(elements.capacity(), 0.0);
+    // size_t i = 0;
+    // for (; i < elements.size(); ++i)
+    //     elements[i] = 0.0;
+    // for (; i < elements.capacity(); ++i)
+    //     elements.push_back(0.0);
     return *this;
 }
 

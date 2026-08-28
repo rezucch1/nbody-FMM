@@ -4,6 +4,7 @@
 #include <complex>
 #include "base_multipole_set_i.hpp"
 #include <iostream>
+#include <memory>
 
 class MultipoleSetI;
 #include "power_set.hpp"

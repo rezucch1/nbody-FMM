@@ -19,18 +19,20 @@ inline MultipoleSet<3>::MultipoleSet(unsigned int L)
 }
 
 std::complex<double> MultipoleSet<3>::operator()(unsigned l, int m) const{
-    unsigned int idx = 2*l*l + 2*l + 2*m + 1;
+    if (l == 0)
+        return std::complex<double>(elements[0], 0.0);
+    unsigned int idx = 2*l*l + 2*l + 2*m - 1;
     return std::complex<double>(elements[idx], elements[idx + 1]);
 }
 
 MultipoleSetI &MultipoleSet<3>::operator+=(const PowerSetI &z){ 
-    elements[0] = z(0).real();
+    elements[0] += z(0).real();
     unsigned int idx = 1;
     for (unsigned int n = 1; n <= L; ++n){
-        for (int m = -n; m <= n; ++n){
+        for (int m = -n; m <= (int) n; ++m){
             auto z_complex = z(n, m);
-            elements[idx] = z_complex.real();
-            elements[idx + 1] = z_complex.imag();
+            elements[idx] += z_complex.real();
+            elements[idx + 1] += z_complex.imag();
             idx += 2;
         }
     }
@@ -40,17 +42,17 @@ MultipoleSetI &MultipoleSet<3>::operator+=(const PowerSetI &z){
 std::unique_ptr<MultipoleSetI> MultipoleSet<3>::weigh_children_with_distance(const Tensor &d) const{
 
     auto M = new MultipoleSet<3>(L);
-    M = 0;
+    // *M = 0;
     const auto regular = PowerSet<3>(L, d);
 
-    M->elements[0] = elements[0];
+    M->elements.push_back(elements[0]);
 
-    for (unsigned int j = 1; j <=L; ++j){
-        for (int k = -j; k <= j; ++k){
+    for (int j = 1; j <=L; ++j){
+        for (int k = -j; k <= (int) j; ++k){
             double A_row = 1;
             std::complex<double> m_complex = (*this)(0, 0) * A_row * regular(j, k);
             int m_row = k;
-            for (unsigned int n = j-1; n >= 0; --n){
+            for (int n = j-1; n >= 0; --n){
                 if (m_row < 0){
                     ++m_row;
                     A_row *= std::sqrt(((2*n - j + k + 1)*(2*n - j + k + 2))/((2*j - 2*n)*(2*j - 2*n - 1)));
@@ -72,9 +74,8 @@ std::unique_ptr<MultipoleSetI> MultipoleSet<3>::weigh_children_with_distance(con
                     m_complex += (*this)(j - n, k - m) * imaginary_power[(4 + (std::abs(k) - std::abs(m) - std::abs(k - m)) % 4) % 4] * A * regular(n, m);
                 }
             }
-            const unsigned int idx = 2*j*j + 2*j + 2*k + 1;
-            M->elements[idx] = m_complex.real();
-            M->elements[idx + 1] = m_complex.imag();
+            M->elements.push_back(m_complex.real());
+            M->elements.push_back(m_complex.imag());
         }
     }
     return std::unique_ptr<MultipoleSetI>(M);
@@ -83,13 +84,12 @@ std::unique_ptr<MultipoleSetI> MultipoleSet<3>::weigh_children_with_distance(con
 std::unique_ptr<LocalSetI> MultipoleSet<3U>::to_local(const Tensor &d) const{
 
     auto L = new LocalSet<3>(this->L);
-    L = 0;
     const auto irregular = Irregular(2 * this->L, d);
 
     L->set_elements(0, 0, {elements[0], 0});
 
     for (unsigned int j = 1; j <= this->L; ++j){
-        for (int k = -j; k <= j; ++k){
+        for (int k = -j; k <= (int) j; ++k){
             double A_row = 1;
             int sign = 1;
             std::complex<double> l_complex = (*this)(0, 0) * A_row * irregular(j, k);

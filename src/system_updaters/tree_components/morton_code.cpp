@@ -6,7 +6,7 @@
 #include "morton_code.hpp"
 #include <cstring>
 
-unsigned int Morton::encode(const unsigned int *cartesian_coordinates, unsigned int dim){
+size_t Morton::encode(const unsigned int *cartesian_coordinates, unsigned int dim){
   unsigned int code = 0;
   unsigned int temp_cartesian_coordinates[dim];
   std::memcpy(temp_cartesian_coordinates, cartesian_coordinates, sizeof(unsigned int) * dim);
@@ -21,7 +21,7 @@ unsigned int Morton::encode(const unsigned int *cartesian_coordinates, unsigned 
   return code;
 }
 
-void Morton::decode(unsigned int *cartesian_coordinates, unsigned int dim, unsigned code){
+void Morton::decode(unsigned int *cartesian_coordinates, unsigned int dim, size_t code){
   for (unsigned int i = 0; i < dim; ++i)
     cartesian_coordinates[i] = 0;
 

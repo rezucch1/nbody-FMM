@@ -11,7 +11,11 @@ Leaf::Leaf(std::vector<std::vector<std::unique_ptr<NodeI>>> &allocator, unsigned
 
 void Leaf::compute_multipoles(unsigned int L){
     calculateMC();
-    multipole_set = std::make_unique<MultipoleSet<2>>(L);
+    if (dim == 2)
+        multipole_set = std::make_unique<MultipoleSet<2>>(L);
+    else if (dim == 3)
+        multipole_set = std::make_unique<MultipoleSet<3>>(L);
+
     (*multipole_set) = 0;
     for( auto p = particles_begin; p< particles_end; ++p){
         Tensor r = (*p)->get_position() - mass_center;
@@ -19,13 +23,14 @@ void Leaf::compute_multipoles(unsigned int L){
         std::unique_ptr<PowerSetI> z;
         if (dim == 2)
             z = std::make_unique<PowerSet<2>>(L, r);
-        else if (r.dim == 3){
+        else if (dim == 3)
             z = std::make_unique<PowerSet<3>>(L, r);
-        }
 
         (*z) *= (*p)->get_weight();
         (*multipole_set) += *z;
     }
+    if ((*multipole_set)(0).real() == 0)
+        printf("break\n");
 }
 
 void Leaf::compute_acceleration(){
@@ -38,6 +43,7 @@ void Leaf::compute_acceleration(){
                 if (dim % 2 == 1) grad_i /= d.norm();
             }
         }
+        (*i)->compute_new_accelaration(grad_i);
     }
 }
 

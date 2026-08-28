@@ -7,6 +7,7 @@
 
 Particle::Particle(double weight, Tensor &&pos, Tensor &&vel)
 	: weight(weight)
+	, acceleration(0 * pos)
 	, position(pos)
 	, velocity(vel)
 	{}

@@ -51,4 +51,6 @@ class MultipoleSet<3> : public MultipoleSetI {
      * @return Unique pointer to converted 3D LocalSet.
      */
     virtual std::unique_ptr<LocalSetI> to_local(const Tensor &d) const;
+
+    using MultipoleSetI::operator=;
 };

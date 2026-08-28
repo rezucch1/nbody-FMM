@@ -18,8 +18,11 @@ void Node::compute_multipoles(unsigned int L){
         (*c)->compute_multipoles(L);
 
     calculateMC();
+    if (dim == 2)
+      multipole_set = std::make_unique<MultipoleSet<2>>(L);
+    else if (dim == 3)
+      multipole_set = std::make_unique<MultipoleSet<3>>(L);
 
-    multipole_set = std::make_unique<MultipoleSet<2>>(L);
     (*multipole_set) = 0;
     for (auto c = get_children_begin(); c < get_children_end(); ++c) if (*c)
         *multipole_set += *getMultipoleSet(**c)->weigh_children_with_distance(NodeI::getMassCenter(**c) - mass_center);
@@ -85,9 +88,12 @@ void Node::calculateMC()
     for(auto c = get_children_begin(); c < get_children_end(); ++c) if (*c){
         double child_mass = (*getMultipoleSet(**c))(0).real();
         total_mass += child_mass;
-        mass_center = child_mass * NodeI::getMassCenter(**c);
+        mass_center += child_mass * NodeI::getMassCenter(**c);
     }
     mass_center /= total_mass;
+    for (int i = 0; i < dim; ++i)
+      if (std::isnan(mass_center[i]))
+        printf("break\n");
 
     return;
 }

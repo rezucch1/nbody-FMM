@@ -114,7 +114,7 @@ unsigned int NodeI::get_id() const{
 
 void NodeI::collect_multipoles_to_locals(){
     auto s = interaction_list.cbegin();
-    for (;*s == nullptr && s < interaction_list.cend(); ++s);
+    for (;s < interaction_list.cend()&& *s == nullptr; ++s);
     if (s == interaction_list.cend()){
         local_set = nullptr;
         return;
