@@ -21,8 +21,20 @@ std::unique_ptr<MultipoleSetI> MultipoleSet<2>::weigh_children_with_distance(con
 {
     std::unique_ptr<MultipoleSet<2>> M = std::make_unique<MultipoleSet<2>>(L);
     *M = 0;
-    M->elements[0] = MultipoleSetI::getElements(*this)[0];
+    
+    // k = 0 contribution: M_l
+    for (unsigned int l = 0; l <= L; ++l) {
+        if (l == 0)
+            M->elements[0] = (*this)(0).real();
+        else {
+            M->elements[2*l-1] = (*this)(l).real();
+            M->elements[2*l]   = (*this)(l).imag();
+        }
+    }
+
+
     std::complex<double> d_k = 1;
+
 
     for(int k = 1; k <= L; k++){
         d_k *= std::complex{d[0], d[1]};

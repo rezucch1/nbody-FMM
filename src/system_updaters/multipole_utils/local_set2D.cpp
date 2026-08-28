@@ -55,12 +55,11 @@ LocalSet<2> *LocalSet<2>::distribute_parent_with_distance(const Tensor &d) const
 
 Tensor LocalSet<2U>::get_gradient(const Tensor &d) const{
   Tensor grad{0.0, 0.0};
-  auto pow = 1.0 / std::complex<double>(d[0], -d[1]);
-  pow /= (d[0]*d[0] + d[1]*d[1]); 
-  for (unsigned int n = 0; n <= L; ++n){
+  auto pow = std::complex(1.0, 0.0); 
+  for (unsigned int n = 1; n <= L; ++n){
     std::complex<double> complex_grad_n = (double)n * get_element(n) * pow;
-    grad += {complex_grad_n.real(), -complex_grad_n.imag()};
-    pow *= std::complex<double>{d[0], -d[1]};
+    grad += {-complex_grad_n.real(), +complex_grad_n.imag()};
+    pow *= std::complex<double>{d[0], d[1]};
   }
   return grad;
 }

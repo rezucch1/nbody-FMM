@@ -38,7 +38,7 @@ void Leaf::compute_acceleration(){
         Tensor grad_i = local_set->get_gradient((*i)->get_position() - mass_center);
         for (const auto &n : neighbours_list) if (n){
             for (auto j = ((Leaf*)n)->particles_begin; j < ((Leaf*)n)->particles_end; ++j){
-                Tensor d = (*j)->get_position() - (*i)->get_position();
+                Tensor d = (*i)->get_position() - (*j)->get_position();
                 grad_i -= (*j)->get_weight() * d / std::pow(d.squared_norm(), dim/2);
                 if (dim % 2 == 1) grad_i /= d.norm();
             }
