@@ -87,7 +87,7 @@ Tensor LocalSet<3U>::get_gradient(const Tensor &d) const{
       const std::complex<double> y_base = regular(j, k) * std::complex<double>(d[1] * j, d[0] * k);
       gradient += {
         (((*this)(j, -k) * std::conj(x_base)).real() + ((*this)(j, k) * x_base).real()) / denominator,
-        (((*this)(j, -k) * std::conj(y_base)).real() + ((*this)(j, k) * x_base).real()) / denominator,
+        (((*this)(j, -k) * std::conj(y_base)).real() + ((*this)(j, k) * y_base).real()) / denominator,
         0.0
       };
     }
