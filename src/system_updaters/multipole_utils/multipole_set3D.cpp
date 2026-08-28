@@ -50,28 +50,28 @@ std::unique_ptr<MultipoleSetI> MultipoleSet<3>::weigh_children_with_distance(con
     for (int j = 1; j <=L; ++j){
         for (int k = -j; k <= (int) j; ++k){
             double A_row = 1;
-            std::complex<double> m_complex = (*this)(0, 0) * A_row * regular(j, k);
+            std::complex<double> m_complex = (*this)(0, 0) * A_row * regular(j, -k);
             int m_row = k;
             for (int n = j-1; n >= 0; --n){
                 if (m_row < 0){
                     ++m_row;
-                    A_row *= std::sqrt(((2*n - j + k + 1)*(2*n - j + k + 2))/((2*j - 2*n)*(2*j - 2*n - 1)));
+                    A_row *= std::sqrt((double)((2*n - j + k + 1)*(2*n - j + k + 2))/((2*j - 2*n)*(2*j - 2*n - 1)));
                 } else if (m_row > 0){
                     --m_row;
-                    A_row = std::sqrt(((2*n - j + k + 1)*(2*n - j + k + 2))/((2*j - 2*n)*(2*j - 2*n - 1)));
+                    A_row *= std::sqrt((double)((2*n - j + k + 1)*(2*n - j + k + 2))/((2*j - 2*n)*(2*j - 2*n - 1)));
                 } else { // m_row == 0
-                    A_row = n + 1 / std::sqrt((j - k - n)*(j + k - n));
+                    A_row *= (n + 1) / std::sqrt((j - k - n)*(j + k - n));
                 }
                 double A = A_row;
-                m_complex += (*this)(j - n, k - m_row) * imaginary_power[(4 + (std::abs(k) - std::abs(m_row) - std::abs(k - m_row)) % 4) % 4] * A * regular(n, m_row);
+                m_complex += (*this)(j - n, k - m_row) * imaginary_power[(4 + (std::abs(k) - std::abs(m_row) - std::abs(k - m_row)) % 4) % 4] * A * regular(n, -m_row);
                 for (int m = m_row - 1; m >= -n && m >= k + n - j; --m){
-                    A *= sqrt(((n + m + 1)*(j - k - n + m + 1)/(n - m)*(j + k - n - m)));
-                    m_complex += (*this)(j - n, k - m) * imaginary_power[(4 + (std::abs(k) - std::abs(m) - std::abs(k - m)) % 4) % 4] * A * regular(n, m);
+                    A *= sqrt((double)((n + m + 1)*(j - k - n + m + 1))/((n - m)*(j + k - n - m)));
+                    m_complex += (*this)(j - n, k - m) * imaginary_power[(4 + (std::abs(k) - std::abs(m) - std::abs(k - m)) % 4) % 4] * A * regular(n, -m);
                 }
                 A = A_row;
                 for (int m = m_row + 1; m <= n && m <= k + j - n; ++m ){
-                    A *= sqrt(((n - m + 1)*(j + k - n - m + 1)/(n + m)*(j - k - n + m)));
-                    m_complex += (*this)(j - n, k - m) * imaginary_power[(4 + (std::abs(k) - std::abs(m) - std::abs(k - m)) % 4) % 4] * A * regular(n, m);
+                    A *= sqrt((double)((n - m + 1)*(j + k - n - m + 1))/((n + m)*(j - k - n + m)));
+                    m_complex += (*this)(j - n, k - m) * imaginary_power[(4 + (std::abs(k) - std::abs(m) - std::abs(k - m)) % 4) % 4] * A * regular(n, -m);
                 }
             }
             M->elements.push_back(m_complex.real());
@@ -86,26 +86,24 @@ std::unique_ptr<LocalSetI> MultipoleSet<3U>::to_local(const Tensor &d) const{
     auto L = new LocalSet<3>(this->L);
     const auto irregular = Irregular(2 * this->L, d);
 
-    L->set_elements(0, 0, {elements[0], 0});
-
-    for (unsigned int j = 1; j <= this->L; ++j){
+    for (unsigned int j = 0; j <= this->L; ++j){
         for (int k = -j; k <= (int) j; ++k){
             double A_row = 1;
             int sign = 1;
-            std::complex<double> l_complex = (*this)(0, 0) * A_row * irregular(j, k);
+            std::complex<double> l_complex = (*this)(0, 0) * A_row * irregular(j, -k);
             for (unsigned int n = 1; n <= this->L; ++n){
                 A_row = std::sqrt((n + j + k)*(n + j - k)) / n;
                 sign = -sign;
                 double A = A_row;
-                l_complex += (double)sign * (*this)(n, 0) * A * irregular(j + n, k);
+                l_complex += (double)sign * (*this)(n, 0) * A * irregular(j + n, -k);
                 for (int m = - 1; m >= -n; --m){
-                    A *= sqrt(((n - m + j + k)*(n + m + 1)/(n + m + j - k + 1)*(n - m)));
-                    l_complex += (double)sign * (*this)(n, m) * imaginary_power[(4 + (std::abs(k - m) - std::abs(k) - std::abs(m)) % 4) % 4] * A * irregular(j+n, k-m);
+                    A *= sqrt(((double)((n - m + j + k)*(n + m + 1))/((n + m + j - k + 1)*(n - m))));
+                    l_complex += (double)sign * (*this)(n, m) * imaginary_power[(4 + (std::abs(k - m) - std::abs(k) - std::abs(m)) % 4) % 4] * A * irregular(j+n, m-k);
                 }
                 A = A_row;
                 for (int m = 1; m <= n; ++m ){
-                    A *= sqrt(((n + m + j - k)*(n - m + 1)/(n - m + j + k + 1)*(n + m)));
-                    l_complex += (double)sign * (*this)(n, m) * imaginary_power[(4 + (std::abs(k - m) - std::abs(k) - std::abs(m)) % 4) % 4] * A * irregular(j+n, k-m);
+                    A *= sqrt(((double)((n + m + j - k)*(n - m + 1))/((n - m + j + k + 1)*(n + m))));
+                    l_complex += (double)sign * (*this)(n, m) * imaginary_power[(4 + (std::abs(k - m) - std::abs(k) - std::abs(m)) % 4) % 4] * A * irregular(j+n, m-k);
                 }
             }
             L->set_elements(j, k, l_complex);
