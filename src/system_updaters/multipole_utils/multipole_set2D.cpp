@@ -65,8 +65,8 @@ std::unique_ptr<LocalSetI> MultipoleSet<2>::to_local(const Tensor &d) const{
         unsigned int bin_coef = 1;
 
         for (unsigned int k = 1; k <= L; ++k){
-            z_k *= z; 
-            local->get_element(0) += (double)sign * bin_coef * (*this)(k)/((double)k * z_k);
+            z_kn *= z; 
+            local->get_element(n) += (double)sign * bin_coef * (*this)(k)/((double)k * z_kn);
             bin_coef *= k + n;
             bin_coef /= k;
         }

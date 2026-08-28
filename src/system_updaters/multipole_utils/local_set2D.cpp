@@ -59,7 +59,7 @@ Tensor LocalSet<2U>::get_gradient(const Tensor &d) const{
   pow /= (d[0]*d[0] + d[1]*d[1]); 
   for (unsigned int n = 0; n <= L; ++n){
     std::complex<double> complex_grad_n = (double)n * get_element(n) * pow;
-    grad += {-complex_grad_n.real(), +complex_grad_n.imag()};
+    grad += {complex_grad_n.real(), -complex_grad_n.imag()};
     pow *= std::complex<double>{d[0], -d[1]};
   }
   return grad;
