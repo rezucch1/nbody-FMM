@@ -57,13 +57,13 @@ LocalSet<3U> *LocalSet<3U>::distribute_parent_with_distance(const Tensor &d) con
         double A = A_row;
         l_complex += (double)sign * (*this)(n, k) * A * regular(n - j, 0);
         for (int m = k - 1; m >= k - n + j; --m){
-          A *= sqrt(((n - m)*(n + m -j - k + 1)/(n + m + 1)*(n - m - j + k)));
-          l_complex += (double)sign * (*this)(n, m) * imaginary_power[(4 + (std::abs(m) - std::abs(m - k) - std::abs(k)) % 4) % 4] * A * regular(n - j, k - m);
+          A *= sqrt((double)((n - m)*(n + m -j - k + 1))/((n + m + 1)*(n - m - j + k)));
+          l_complex += (double)sign * (*this)(n, m) * imaginary_power[(4 + (std::abs(m) - std::abs(m - k) - std::abs(k)) % 4) % 4] * A * regular(n - j, m - k);
         }
         A = A_row;
         for (int m = k + 1; m <= k + n - j; ++m ){
-          A *= sqrt(((n + m)*(n - m - j + k + 1)/(n - m + 1)*(n + m - j - k)));
-          l_complex += (double)sign * (*this)(n, m) * imaginary_power[(4 + (std::abs(m) - std::abs(m - k) - std::abs(k)) % 4) % 4] * A * regular(n - j, k - m);
+          A *= sqrt((double)((n + m)*(n - m - j + k + 1))/((n - m + 1)*(n + m - j - k)));
+          l_complex += (double)sign * (*this)(n, m) * imaginary_power[(4 + (std::abs(m) - std::abs(m - k) - std::abs(k)) % 4) % 4] * A * regular(n - j, m - k);
         }
       }
       L->set_elements(j, k, l_complex);
