@@ -51,7 +51,7 @@ void Leaf::compute_acceleration(){
                 }
                 else if (dim == 3) {
                     // Kernel: 1/r
-                    grad_i -= (*j)->get_weight()
+                    grad_i += (*j)->get_weight()
                             * d / std::pow(d.squared_norm(), 1.5);
                 }
 
