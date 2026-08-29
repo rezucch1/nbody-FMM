@@ -92,7 +92,7 @@ void Tree::init_tree(const Particle *begin, const Particle *end)
 
 void Tree::compute_accelerations(){
   
-  nodes_vector[0][0]->compute_multipoles(2);
+  nodes_vector[0][0]->compute_multipoles(8);
   nodes_vector[0][0]->collect_multipoles_to_locals();
   nodes_vector[0][0]->propagate_locals();
 

@@ -18,21 +18,21 @@
 constexpr double TOTAL_TIME = 10000000.0;
 constexpr double TIMESTAMP_STEP = 100000.0;
 constexpr unsigned int RANDOM_SEED = 1234;
-constexpr unsigned int NUM_PARTICLES = 15000;
+constexpr unsigned int NUM_PARTICLES = 500;
 constexpr double DOMAIN_BOUND = 100.0;
-constexpr double MAX_MASS = 100000.0;
+constexpr double MAX_MASS = 1.0e10;
 constexpr double MAX_VEL = 0.0;
 
 std::unique_ptr<QuadratureMethod> quadrature_method(new SyplecticEuler());
 std::unique_ptr<SystemUpdateMethod> update_method(new FMM());
-
+//std::unique_ptr<SystemUpdateMethod> update_method(new NaiveUpdate());
 int main(){
   std::vector<Particle> particles;
   particles.reserve(NUM_PARTICLES);
   srand(RANDOM_SEED);
 
   for (unsigned int p = 0; p < NUM_PARTICLES; ++p)
-    particles.push_back(Particle(rand()*MAX_MASS/RAND_MAX, {rand()*(2*DOMAIN_BOUND)/RAND_MAX - DOMAIN_BOUND, rand()*(2*DOMAIN_BOUND)/RAND_MAX - DOMAIN_BOUND, rand()*(2*DOMAIN_BOUND)/RAND_MAX - DOMAIN_BOUND}, {rand()*(2*MAX_VEL)/RAND_MAX - MAX_VEL, rand()*(2*MAX_VEL)/RAND_MAX - MAX_VEL, rand()*(2*MAX_VEL)/RAND_MAX - MAX_VEL}));
+    particles.push_back(Particle(rand()*MAX_MASS/RAND_MAX, {rand()*(2*DOMAIN_BOUND)/RAND_MAX - DOMAIN_BOUND, rand()*(2*DOMAIN_BOUND)/RAND_MAX - DOMAIN_BOUND}, {rand()*(2*MAX_VEL)/RAND_MAX - MAX_VEL, rand()*(2*MAX_VEL)/RAND_MAX - MAX_VEL}));
 
   HDF5Exporter hdf5_exporter("output", "nbody_fmm");
 
@@ -44,6 +44,7 @@ int main(){
   while (time <= TOTAL_TIME){
     hdf5_exporter.write_frame(particles, step, time);
     quadrature_method->integrate(update_method.get(), particles, TIMESTAMP_STEP);
+
     time += TIMESTAMP_STEP;
     ++step;
   }

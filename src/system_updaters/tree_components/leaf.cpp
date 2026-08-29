@@ -39,7 +39,10 @@ void Leaf::compute_multipoles(unsigned int L){
 }
 
 void Leaf::compute_acceleration(){
-    for (const auto &i : particles){
+    for (auto i = particles_begin; i < particles_end; ++i){
+        Tensor grad_i = local_set->get_gradient((*i)->get_position() - mass_center);
+        
+    /*for (const auto &i : particles){
         Tensor grad_i(dim);
         grad_i *= 0;
         if (local_set) {
@@ -52,16 +55,35 @@ void Leaf::compute_acceleration(){
                 Tensor d = j->get_position() - i->get_position();
                 grad_i -= j->get_weight() * d / std::pow(d.squared_norm(), (dim) / 2);
             }
-        }
+        }*/
 
         // 2. Direct P2P interactions with particles in NEIGHBOR leaf cells
         for (const auto &n : neighbours_list) if (n){
-            for (const auto &j : ((Leaf*)n)->particles){
+            for (auto j = ((Leaf*)n)->particles_begin; j < ((Leaf*)n)->particles_end; ++j){
+                if (*i == *j)
+                    continue;
+                
+                Tensor d = (*i)->get_position() - (*j)->get_position();
+
+                 if (dim == 2) {
+                    // Kernel: -log(r)
+                    grad_i -= (*j)->get_weight()
+                            * d / d.squared_norm();
+                }
+                else if (dim == 3) {
+                    // Kernel: 1/r
+                    grad_i += (*j)->get_weight()
+                            * d / std::pow(d.squared_norm(), 1.5);
+                }
+            }
+
+            /*for (const auto &j : ((Leaf*)n)->particles){
                 Tensor d = j->get_position() - i->get_position();
                 grad_i -= j->get_weight() * d / std::pow(d.squared_norm(), (dim) / 2);
-            }
+            }*/
         }
-        i->compute_new_accelaration(grad_i);
+        //i->compute_new_accelaration(grad_i);
+        (*i)->compute_new_accelaration(grad_i);
     }
 }
 
