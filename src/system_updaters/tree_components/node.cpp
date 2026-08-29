@@ -5,17 +5,16 @@
 
 #include "node.hpp"
 #include "leaf.hpp"
-constexpr unsigned int threshold = 5;
 
-Node::Node(std::vector<std::vector<std::unique_ptr<NodeI>>> &allocator, unsigned int depth, unsigned int id_child, const Particle** particles_begin, const Particle** particles_end)
-    : NodeI(allocator, depth, id_child ,particles_begin, particles_end)
+Node::Node(std::vector<std::unordered_map<uint64_t, std::unique_ptr<NodeI>>> &allocator, unsigned int depth, unsigned int id_child, unsigned int dim)
+    : NodeI(allocator, depth, id_child, dim)
 {
 }
 
 void Node::compute_multipoles(unsigned int L){
 
-    for (auto c = get_children_begin(); c < get_children_end(); ++c) if (*c)
-        (*c)->compute_multipoles(L);
+    for (auto &c : get_children())
+      c.compute_multipoles(L);
 
     calculateMC();
     if (dim == 2)
@@ -24,25 +23,25 @@ void Node::compute_multipoles(unsigned int L){
       multipole_set = std::make_unique<MultipoleSet<3>>(L);
 
     (*multipole_set) = 0;
-    for (auto c = get_children_begin(); c < get_children_end(); ++c) if (*c)
-        *multipole_set += *getMultipoleSet(**c)->weigh_children_with_distance(NodeI::getMassCenter(**c) - mass_center);
+    for (auto &c : get_children())
+      *multipole_set += *getMultipoleSet(c)->weigh_children_with_distance(NodeI::getMassCenter(c) - mass_center);
 }
 
 void Node::collect_multipoles_to_locals(){
     NodeI::collect_multipoles_to_locals();
 
-    for (auto c = get_children_begin(); c < get_children_end(); ++c) if (*c)
-        (*c)->collect_multipoles_to_locals();
+    for (auto &c : get_children())
+      c.collect_multipoles_to_locals();
 }
 
 void Node::propagate_locals(LocalSetI *parent_local){
     NodeI::propagate_locals(parent_local);
 
-    for (auto c = get_children_begin(); c < get_children_end(); ++c) if (*c)
-        if (local_set)
-          (*c)->propagate_locals(local_set->distribute_parent_with_distance(getMassCenter(**c) - mass_center));
-        else 
-          (*c)->propagate_locals(nullptr);
+    for (auto &c : get_children())
+      if (local_set)
+        c.propagate_locals(local_set->distribute_parent_with_distance(getMassCenter(c) - mass_center));
+      else 
+        c.propagate_locals(nullptr);
 }
 
 const std::vector<NodeI *> &Node::get_neighbours() const
@@ -50,34 +49,24 @@ const std::vector<NodeI *> &Node::get_neighbours() const
   return neighbours_list;
 }
 
-void Node::get_partition(std::vector<std::tuple<const Particle *, int, int>> &partitions) const{
-    NodeI::get_partition(partitions);
-
-    for (auto c = get_children_begin(); c < get_children_end(); ++c) if (*c)
-        (*c)->get_partition(partitions);
-}
-
 NodeI *Node::get_child(unsigned int idx)
 {
-  return allocator[depth + 1][id_child * 1<<dim + idx].get();
+  auto it = allocator[depth + 1].find((static_cast<uint64_t>(id_child) << dim) + idx);
+  return (it != allocator[depth + 1].end()) ? it->second.get() : nullptr;
 }
 
-std::vector<std::unique_ptr<NodeI>>::iterator Node::get_children_begin(){
-  return allocator[depth + 1].begin() + (id_child << dim);
+Node::ChildrenContainer Node::get_children(){
+  return ChildrenContainer(*this);
 }
 
-std::vector<std::unique_ptr<NodeI>>::iterator Node::get_children_end(){
-  return allocator[depth + 1].begin() + ((id_child+1) << dim);
+Node::ChildIterator Node::ChildrenContainer::begin() const {
+  auto it = ChildIterator{_this.allocator[_this.depth + 1], _this.id_child << _this.dim, (_this.id_child + 1) << _this.dim};
+  it.first();
+  return it;
 }
 
-std::vector<std::unique_ptr<NodeI>>::const_iterator Node::get_children_begin() const
-{
-  return allocator[depth + 1].cbegin() + (id_child << dim);
-}
-
-std::vector<std::unique_ptr<NodeI>>::const_iterator Node::get_children_end() const
-{
-  return allocator[depth + 1].cbegin() + ((id_child+1) << dim);
+Node::ChildIterator Node::ChildrenContainer::end() const {
+  return ChildIterator{_this.allocator[_this.depth + 1], (_this.id_child + 1) << _this.dim, (_this.id_child + 1) << _this.dim};
 }
 
 void Node::calculateMC()
@@ -85,10 +74,10 @@ void Node::calculateMC()
     mass_center = Tensor(dim);
     mass_center *= 0;
     double total_mass = 0;
-    for(auto c = get_children_begin(); c < get_children_end(); ++c) if (*c){
-        double child_mass = (*getMultipoleSet(**c))(0).real();
+    for(auto &c : get_children()){
+        double child_mass = (*getMultipoleSet(c))(0).real();
         total_mass += child_mass;
-        mass_center += child_mass * NodeI::getMassCenter(**c);
+        mass_center += child_mass * NodeI::getMassCenter(c);
     }
     mass_center /= total_mass;
     for (int i = 0; i < dim; ++i)

@@ -1,5 +1,7 @@
 #pragma once
 #include <memory>
+#include <unordered_map>
+#include <cstdint>
 #include "system_updaters/multipole_utils/power_set.hpp"
 #include "particle.hpp"
 class Node;
@@ -23,21 +25,16 @@ class NodeI {
      * @param particles_begin Start pointer of contained particle array.
      * @param particles_end End pointer of contained particle array.
      */
-    NodeI(std::vector<std::vector<std::unique_ptr<NodeI>>> &allocator, const unsigned int depth, unsigned int id_child, const Particle** particles_begin, const Particle** particles_end)
+    NodeI(std::vector<std::unordered_map<uint64_t, std::unique_ptr<NodeI>>> &allocator, const unsigned int depth, uint64_t id_child, unsigned int dim)
     : allocator(allocator)
     , depth(depth)
     , id_child(id_child)
-    , particles_begin(particles_begin)
-    , particles_end(particles_end)
-    , dim((*particles_begin)->get_position().dim)
+    , dim(dim)
     {}
 
-    std::vector<std::vector<std::unique_ptr<NodeI>>> &allocator; /**< Reference to global tree node grid allocator. */
+    std::vector<std::unordered_map<uint64_t, std::unique_ptr<NodeI>>> &allocator; /**< Reference to global tree node grid allocator. */
     const unsigned int depth;                                   /**< Tree depth level of this node. */
-    const unsigned int id_child;                                /**< Morton code ID of this node at current depth. */
-
-    const Particle** const particles_begin; /**< Start iterator pointer for particles in this cell. */
-    const Particle** const particles_end;   /**< End iterator pointer for particles in this cell. */
+    const uint64_t id_child;                                /**< Morton code ID of this node at current depth. */
 
     std::vector<NodeI*> neighbours_list;  /**< List of adjacent spatial neighbor nodes. */
     std::vector<NodeI*> interaction_list; /**< List of well-separated interaction nodes (well-separated parent-neighbor children). */
@@ -61,12 +58,6 @@ class NodeI {
      * @return Reference to unique_ptr of MultipoleSetI.
      */
     static const std::unique_ptr<MultipoleSetI> &getMultipoleSet(const NodeI &_this); 
-
-    /**
-     * @brief Accumulates particle partition tuples `(Particle*, depth, id_child)` for visualization.
-     * @param partitions Reference to output vector.
-     */
-    virtual void get_partition(std::vector<std::tuple<const Particle*, int, int>> &partitions) const;
 
     /**
      * @brief Computes neighbor and interaction lists using Morton indexing arithmetic.

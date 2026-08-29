@@ -4,12 +4,13 @@
  */
 
 #include "particle.hpp"
+#include <cmath>
 
 Particle::Particle(double weight, Tensor &&pos, Tensor &&vel)
 	: weight(weight)
-	, acceleration(0 * pos)
-	, position(pos)
-	, velocity(vel)
+	, position(std::move(pos))
+	, velocity(std::move(vel))
+	, acceleration(0 * position)
 	{}
 
 const Tensor &Particle::compute_new_accelaration(const Tensor &potential_gradient) const{

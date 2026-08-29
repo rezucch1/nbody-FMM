@@ -15,13 +15,13 @@
  * @brief N-Body simulation driver using FMM and HDF5/XDMF visualization exporter.
  */
 
-constexpr double TOTAL_TIME = 100.0;
-constexpr double TIMESTAMP_STEP = 1.0;
+constexpr double TOTAL_TIME = 10000000.0;
+constexpr double TIMESTAMP_STEP = 100000.0;
 constexpr unsigned int RANDOM_SEED = 1234;
 constexpr unsigned int NUM_PARTICLES = 15000;
 constexpr double DOMAIN_BOUND = 100.0;
-constexpr double MAX_MASS = 100.0;
-constexpr double MAX_VEL = 10.0;
+constexpr double MAX_MASS = 100000.0;
+constexpr double MAX_VEL = 0.0;
 
 std::unique_ptr<QuadratureMethod> quadrature_method(new SyplecticEuler());
 std::unique_ptr<SystemUpdateMethod> update_method(new FMM());
