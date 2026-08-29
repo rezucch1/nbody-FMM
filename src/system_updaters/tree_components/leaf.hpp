@@ -18,6 +18,7 @@ class Leaf : public NodeI {
      * \f[ \mathbf{x}_{cm} = \frac{\sum_i m_i \mathbf{x}_i}{\sum_i m_i} \f]
      */
     virtual void calculateMC() override;
+    const std::vector<const Particle *> particles;
 
   public:
     /**
@@ -28,8 +29,7 @@ class Leaf : public NodeI {
      * @param particles_begin Start particle pointer range.
      * @param particles_end End particle pointer range.
      */
-    Leaf(std::vector<std::vector<std::unique_ptr<NodeI>>> &allocator, unsigned int depth, unsigned int child_id, const Particle** particles_begin,
-         const Particle** particles_end);
+    Leaf(std::vector<std::unordered_map<uint64_t, std::unique_ptr<NodeI>>> &allocator, unsigned int depth, uint64_t child_id, std::vector<const Particle *>::const_iterator particles_begin, std::vector<const Particle *>::const_iterator particles_end);
 
     /**
      * @brief Computes multipole expansion from particles in this leaf cell (P2M phase).

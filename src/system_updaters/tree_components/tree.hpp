@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <vector>
+#include <unordered_map>
 #include <tuple>
 
 #include "node.hpp"
@@ -32,7 +33,7 @@ class Tree {
 
   protected:
     std::vector<const Particle*> particle_ordering;                 /**< Array of particle pointers sorted by Morton code. */
-    std::vector<std::vector<std::unique_ptr<NodeI>>> nodes_vector; /**< 2D grid storing unique pointers to tree nodes by depth level. */
+    std::vector<std::unordered_map<u_int64_t, std::unique_ptr<NodeI>>> nodes_vector; /**< 2D grid storing unique pointers to tree nodes by depth level. */
 
     /**
      * @brief Initializes tree hierarchy iteratively using Morton encoding.

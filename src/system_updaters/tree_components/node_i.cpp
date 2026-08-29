@@ -20,16 +20,6 @@ const Tensor &NodeI::getMassCenter(const NodeI &_this)
     return _this.mass_center;
 }
 
-void NodeI::get_partition(std::vector<std::tuple<const Particle *, int, int>> &partitions) const{
-    std::vector<std::tuple<const Particle *, int, int>> sub_partition;
-    sub_partition.reserve(particles_end - particles_begin);
-
-    for (auto p = particles_begin; p < particles_end; ++p)
-        sub_partition.push_back(std::make_tuple(*p, depth, id_child));
-    
-    partitions.insert(partitions.end(), sub_partition.begin(), sub_partition.end());
-}
-
 void NodeI::compute_interaction_list(){
     neighbours_list.reserve(std::pow(3, dim) - 1);
     interaction_list.reserve(std::pow(3, dim) * ((1<<dim) -1));
@@ -85,10 +75,10 @@ void NodeI::compute_interaction_list(){
                 if (direction[i] < -1 || direction[i] > 1)
                     is_neighbour = false;
 
-            NodeI* neighbour_node;
-            if (neighbour_id >= 0 && neighbour_id < allocator[depth].size()){
-                neighbour_node = allocator[depth][neighbour_id].get();
-                if (is_neighbour){
+            auto it = allocator[depth].find(neighbour_id);
+            if (it != allocator[depth].end() && it->second) {
+                NodeI* neighbour_node = it->second.get();
+                if (is_neighbour) {
                     if (neighbour_id != id_child)
                         neighbours_list.push_back(neighbour_node);
                 } else
@@ -114,7 +104,7 @@ unsigned int NodeI::get_id() const{
 
 void NodeI::collect_multipoles_to_locals(){
     auto s = interaction_list.cbegin();
-    for (;s < interaction_list.cend()&& *s == nullptr; ++s);
+    for (; s < interaction_list.cend() && (*s == nullptr || !getMultipoleSet(**s)); ++s);
     if (s == interaction_list.cend()){
         local_set = nullptr;
         return;
@@ -123,7 +113,7 @@ void NodeI::collect_multipoles_to_locals(){
 
     ++s;
 
-    for (; s < interaction_list.cend(); ++s) if (*s){
+    for (; s < interaction_list.cend(); ++s) if (*s && getMultipoleSet(**s)){
         *local_set += getMultipoleSet(**s)->to_local(mass_center - getMassCenter(**s)).get();
     }
 }

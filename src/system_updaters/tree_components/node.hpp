@@ -2,8 +2,11 @@
 
 #include <memory>
 #include <list>
+#include <unordered_map>
+#include <cstdint>
 #include "particle.hpp"
 #include "math_utils/tensor.hpp"
+#include <cassert>
 
 class Node;
 #include "node_i.hpp"
@@ -18,16 +21,69 @@ class Node;
  * @brief Represents an internal tree node managing child nodes and aggregate multipole expansions.
  */
 class Node : public NodeI {
+  protected:
+
+  struct ChildrenContainer;
+
+  /**
+ * @brief Custom iterator stepping over child nodes in sparse unordered_map allocator.
+ */
+  struct ChildIterator {
+    std::unordered_map<uint64_t, std::unique_ptr<NodeI>> &map;
+    uint64_t offset;
+    const uint64_t max_offset;
+    NodeI *node = nullptr;
+
+    bool operator!=(const ChildIterator& other) const { return offset != other.offset; }
+    bool operator<(const ChildIterator& other) const { return offset < other.offset; }
+    
+    void first(){
+      std::unordered_map<uint64_t, std::unique_ptr<NodeI>>::iterator it;
+      while(offset < max_offset){
+        it = map.find(offset);
+        if (it != map.end()){
+          node = it->second.get();
+          return;
+        }
+        ++offset;
+      }
+      node = nullptr;
+    }
+
+    ChildIterator& operator++() {
+      ++offset;
+      first();
+      return *this;
+    }
+    // ChildIterator operator+(size_t n) const { return ChildIterator{map, base_id, offset + n}; }
+    
+    NodeI &operator*() const {
+      assert(node != nullptr);
+      return *node;
+    }
+
+    NodeI &operator->() const {
+      return operator*();
+    }
+  };
+
+    struct ChildrenContainer{
+      Node &_this;
+      ChildIterator begin() const;
+      ChildIterator end() const;
+    };
+    
+
   public:
+
     /**
      * @brief Constructs an internal Node and initializes child nodes.
      * @param allocator Reference to 2D nodes grid.
      * @param depth Tree level depth.
      * @param id_child Morton child ID.
-     * @param particles_begin Start particle pointer range.
-     * @param particles_end End particle pointer range.
+     * @param dim Spatial dimension.
      */
-    Node(std::vector<std::vector<std::unique_ptr<NodeI>>> &allocator, unsigned int depth, unsigned int id_child, const Particle** particles_begin, const Particle** particles_end);
+    Node(std::vector<std::unordered_map<uint64_t, std::unique_ptr<NodeI>>> &allocator, unsigned int depth, unsigned int id_child, unsigned int dim);
 
     /**
      * @brief Computes multipole expansions recursively upward from children (M2M phase).
@@ -52,12 +108,6 @@ class Node : public NodeI {
      */
     const std::vector<NodeI *> &get_neighbours() const;
 
-    /**
-     * @brief Recursively collects particle spatial partition metadata.
-     * @param partitions Reference to partition output tuple list.
-     */
-    void get_partition(std::vector<std::tuple<const Particle*, int, int>> &partitions) const override;
-
   protected:
     /**
      * @brief Gets child node pointer by index.
@@ -66,29 +116,7 @@ class Node : public NodeI {
      */
     NodeI* get_child(unsigned int idx);
 
-    /**
-     * @brief Gets iterator to start of child nodes.
-     * @return Iterator.
-     */
-    std::vector<std::unique_ptr<NodeI>>::iterator get_children_begin();
-
-    /**
-     * @brief Gets iterator to end of child nodes.
-     * @return Iterator.
-     */
-    std::vector<std::unique_ptr<NodeI>>::iterator get_children_end();
-
-    /**
-     * @brief Gets const iterator to start of child nodes.
-     * @return Const iterator.
-     */
-    std::vector<std::unique_ptr<NodeI>>::const_iterator get_children_begin() const;
-
-    /**
-     * @brief Gets const iterator to end of child nodes.
-     * @return Const iterator.
-     */
-    std::vector<std::unique_ptr<NodeI>>::const_iterator get_children_end() const;
+    ChildrenContainer get_children();
 
     /**
      * @brief Calculates center of mass from child node centers of mass.

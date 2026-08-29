@@ -73,7 +73,7 @@ LocalSet<3U> *LocalSet<3U>::distribute_parent_with_distance(const Tensor &d) con
 }
 
 Tensor LocalSet<3U>::get_gradient(const Tensor &d) const{
-  Tensor gradient{0.0, 0.0, 0.0};
+    Tensor gradient{0.0, 0.0, 0.0};
   PowerSet<3> regular(L, d);
   double denominator = d[0]*d[0] + d[1]*d[1];
   for (unsigned int j = 1; j <= L; ++j){
@@ -100,7 +100,7 @@ Tensor LocalSet<3U>::get_gradient(const Tensor &d) const{
       };
     }
   }
-  return gradient;
+    return gradient;
 }
 
 template class LocalSet<3>;

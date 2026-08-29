@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include <cstdint>
 
 /**
  * @file morton_code.hpp
@@ -18,7 +19,7 @@ class Morton {
      * @param dim Spatial dimension \f$ d \f$.
      * @return Encoded Morton Z-order integer code.
      */
-    static size_t encode(const unsigned int* cartesian_coordinates, unsigned int dim);
+    static uint64_t encode(const unsigned int* cartesian_coordinates, unsigned int dim);
 
     /**
      * @brief Decodes a 1D Morton code back into multi-dimensional integer Cartesian coordinates.
@@ -26,5 +27,5 @@ class Morton {
      * @param dim Spatial dimension \f$ d \f$.
      * @param code Morton Z-order integer code to decode.
      */
-    static void decode(unsigned int* cartesian_coordinates, unsigned int dim, size_t code);
+    static void decode(unsigned int* cartesian_coordinates, unsigned int dim, uint64_t code);
 };
