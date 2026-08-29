@@ -4,7 +4,7 @@ project(nbody LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# find_package(MPI REQUIRED)
+find_package(MPI REQUIRED)
 find_package(HDF5 REQUIRED COMPONENTS C)
 
 add_compile_options(-O0 -g)
@@ -25,5 +25,5 @@ target_link_libraries(nbody PRIVATE
     multipole_utils
     tree_components
     ${HDF5_LIBRARIES}
-    # MPI::MPI_CXX
+    MPI::MPI_CXX
 )
