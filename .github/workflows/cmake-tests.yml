@@ -1,0 +1,51 @@
+name: C++ CMake & CTest CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    name: Build & Run GoogleTest Suite (Ubuntu)
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install System Dependencies (GCC, OpenMPI, HDF5)
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+          build-essential \
+          g++ \
+          gcc \
+          cmake \
+          ninja-build \
+          openmpi-bin \
+          libopenmpi-dev \
+          libhdf5-dev \
+          libhdf5-openmpi-dev \
+          hdf5-tools \
+          gcovr
+
+    - name: Configure CMake
+      run: |
+        cmake -B build \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DENABLE_COVERAGE=ON
+
+    - name: Build Project & Test Executables
+      run: |
+        cmake --build build --parallel $(nproc)
+
+    - name: Run CTest Unit Test Suite
+      run: |
+        ctest --test-dir build --output-on-failure --parallel $(nproc)
+
+    - name: Generate Code Coverage Summary
+      if: always()
+      run: |
+        gcovr -r . --filter 'src/' --txt

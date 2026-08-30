@@ -4,6 +4,16 @@ project(nbody LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+enable_testing()
+
+option(ENABLE_COVERAGE "Enable GCC/Clang code coverage reporting" OFF)
+if(ENABLE_COVERAGE)
+    add_compile_options(--coverage -O0 -g)
+    add_link_options(--coverage)
+else()
+    add_compile_options(-O0 -g)
+endif()
+
 find_package(MPI REQUIRED)
 find_package(HDF5 REQUIRED COMPONENTS C)
 
@@ -15,6 +25,7 @@ add_executable(nbody
 )
 
 add_subdirectory(src)
+add_subdirectory(tests)
 
 target_link_libraries(nbody PRIVATE
     nbody_core
