@@ -35,7 +35,7 @@ void Node::collect_multipoles_to_locals(){
 }
 
 void Node::propagate_locals(const LocalSetI *parent_local){
-    NodeI::propagate_locals(parent_local);
+  NodeI::propagate_locals(parent_local);
 
     for (auto &c : get_children())
       if (local_set) {

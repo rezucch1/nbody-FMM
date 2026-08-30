@@ -22,7 +22,7 @@ void NaiveUpdate::update(const std::vector<Particle> &particles) {
                 * distance;
         }
         else if (dim == 3) {
-          p_gradient += other.get_weight()
+          p_gradient -= other.get_weight()
                       / ((squared_distance_norm + 1.0e-4) * distance.norm())
                       * distance;
         }

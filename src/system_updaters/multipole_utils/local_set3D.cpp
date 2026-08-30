@@ -76,34 +76,146 @@ std::unique_ptr<LocalSetI> LocalSet<3U>::distribute_parent_with_distance(const T
   return L;
 }
 
-Tensor LocalSet<3U>::get_gradient(const Tensor &d) const{
+Tensor LocalSet<3U>::get_gradient(const Tensor &d) const
+{
     Tensor gradient{0.0, 0.0, 0.0};
-  PowerSet<3> regular(L, d);
-  double denominator = d[0]*d[0] + d[1]*d[1];
-  for (unsigned int j = 1; j <= L; ++j){
-    gradient += {
-      (*this)(j, 0).real() * regular(j, 0).real() * j * d[0] / denominator,
-      (*this)(j, 0).real() * regular(j, 0).real() * j * d[1] / denominator,
-      0.0
-    };
-    for (int k = 1; k <= j; ++k){
-      const std::complex<double> x_base = regular(j, k) * std::complex<double>(d[0] * j, -d[1] * k);
-      const std::complex<double> y_base = regular(j, k) * std::complex<double>(d[1] * j, d[0] * k);
-      gradient += {
-        (((*this)(j, -k) * std::conj(x_base)).real() + ((*this)(j, k) * x_base).real()) / denominator,
-        (((*this)(j, -k) * std::conj(y_base)).real() + ((*this)(j, k) * y_base).real()) / denominator,
-        0.0
-      };
+
+    PowerSet<3> regular(L, d);
+
+for (unsigned int j = 0; j <= L; ++j) {
+    for (int k = -static_cast<int>(j);
+         k <= static_cast<int>(j);
+         ++k) {
+
+        auto coeff = (*this)(j, k);
+
+        if (std::abs(coeff) > 1e-14) {
+            std::cout << "  L(" << j << "," << k << ") = "
+                      << coeff << std::endl;
+        }
     }
-    for (int k = -j + 1; k <= j - 1; ++k){
-      const double z_gradient = ((*this)(j, k) * std::sqrt(j*j - k*k) * regular(j - 1, k)).real();
-      gradient += {
-        - z_gradient * d[0]*d[2] / denominator,
-        - z_gradient * d[1]*d[2] / denominator,
-        z_gradient
-      };
+}
+    for (unsigned int j = 1; j <= L; ++j) {
+
+        for (int k = -static_cast<int>(j);
+             k <= static_cast<int>(j);
+             ++k) {
+
+            const std::complex<double> L_jk = (*this)(j, k);
+
+            // dR_j^k / dx
+            std::complex<double> dRdx{0.0, 0.0};
+            if (k >= 0) {
+              // R_{j-1}^{k-1}
+              if (std::abs(k - 1) <= static_cast<int>(j - 1)) {
+                dRdx -=
+                0.5
+                * std::sqrt(static_cast<double>((j + k) * (j + k - 1)))
+                * regular(j - 1, k - 1);
+              }
+              // R_{j-1}^{k+1}
+              if (std::abs(k + 1) <= static_cast<int>(j - 1)) {
+                dRdx +=
+                0.5
+                * std::sqrt(static_cast<double>((j - k) * (j - k - 1)))
+                * regular(j - 1, k + 1);
+              }
+            }
+            else {
+              // k < 0
+              const int m = -k;
+              std::complex<double> dRdx_pos{0.0, 0.0};
+              if (std::abs(m - 1) <= static_cast<int>(j - 1)) {
+                dRdx_pos -=
+                0.5
+                * std::sqrt(static_cast<double>((j + m) * (j + m - 1)))
+                * regular(j - 1, m - 1);
+              }
+              if (std::abs(m + 1) <= static_cast<int>(j - 1)) {
+                dRdx_pos +=
+                0.5
+                * std::sqrt(static_cast<double>((j - m) * (j - m - 1)))
+                * regular(j - 1, m + 1);
+              }
+              dRdx = ((m % 2) ? -1.0 : 1.0)* std::conj(dRdx_pos);
+}
+// dR_j^k / dy
+std::complex<double> dRdy{0.0, 0.0};
+
+if (k >= 0) {
+
+    if (std::abs(k - 1) <= static_cast<int>(j - 1)) {
+        dRdy +=
+            std::complex<double>(0.0, -0.5)
+            * std::sqrt(
+                static_cast<double>(
+                    (j + k) * (j + k - 1)
+                )
+            )
+            * regular(j - 1, k - 1);
     }
-  }
+
+    if (std::abs(k + 1) <= static_cast<int>(j - 1)) {
+        dRdy +=
+            std::complex<double>(0.0, -0.5)
+            * std::sqrt(
+                static_cast<double>(
+                    (j - k) * (j - k - 1)
+                )
+            )
+            * regular(j - 1, k + 1);
+    }
+}
+else {
+
+    const int m = -k;
+
+    std::complex<double> dRdy_pos{0.0, 0.0};
+
+    if (std::abs(m - 1) <= static_cast<int>(j - 1)) {
+        dRdy_pos +=
+            std::complex<double>(0.0, -0.5)
+            * std::sqrt(
+                static_cast<double>(
+                    (j + m) * (j + m - 1)
+                )
+            )
+            * regular(j - 1, m - 1);
+    }
+
+    if (std::abs(m + 1) <= static_cast<int>(j - 1)) {
+        dRdy_pos +=
+            std::complex<double>(0.0, -0.5)
+            * std::sqrt(
+                static_cast<double>(
+                    (j - m) * (j - m - 1)
+                )
+            )
+            * regular(j - 1, m + 1);
+    }
+
+    dRdy =
+        ((m % 2) ? -1.0 : 1.0)
+        * std::conj(dRdy_pos);
+}
+
+std::complex<double> dRdz{0.0, 0.0};
+
+if (std::abs(k) <= static_cast<int>(j - 1)) {
+    dRdz =
+        std::sqrt(
+            static_cast<double>(
+                (j - std::abs(k)) *
+                (j + std::abs(k))
+            )
+        )
+        * regular(j - 1, k);
+}
+            gradient[0] += (L_jk * dRdx).real();
+            gradient[1] += (L_jk * dRdy).real();
+            gradient[2] += (L_jk * dRdz).real();
+        }
+    }
     return gradient;
 }
 

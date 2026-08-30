@@ -7,7 +7,7 @@
 #include "node.hpp"
 
 Node &NodeI::get_parent(){
-  return *(Node*)allocator[depth - 1][id_child / 4].get();
+  return *(Node*)allocator[depth - 1][id_child >> dim].get();
 }
 
 const std::unique_ptr<MultipoleSetI> &NodeI::getMultipoleSet(const NodeI &_this)
@@ -103,17 +103,18 @@ unsigned int NodeI::get_id() const{
 }
 
 void NodeI::collect_multipoles_to_locals(){
+    
     auto s = interaction_list.cbegin();
     for (; s < interaction_list.cend() && (*s == nullptr || !getMultipoleSet(**s)); ++s);
     if (s == interaction_list.cend()){
-        local_set = nullptr;
+        local_set =  nullptr;
         return;
     }
     local_set = getMultipoleSet(**s)->to_local(mass_center - getMassCenter(**s));
 
     ++s;
 
-    for (; s < interaction_list.cend(); ++s) if (*s && getMultipoleSet(**s)){
+    for (; s != interaction_list.cend(); ++s) if (*s && getMultipoleSet(**s)){
         *local_set += getMultipoleSet(**s)->to_local(mass_center - getMassCenter(**s)).get();
     }
 }

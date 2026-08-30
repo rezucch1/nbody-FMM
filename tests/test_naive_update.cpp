@@ -23,6 +23,8 @@ TEST(NaiveUpdateTest, TwoParticlesGetCloserUnderGravity) {
 
     // 2. Initialize NaiveUpdate solver and SymplecticEuler integrator
     NaiveUpdate solver;
+    
+    solver.update(particles);
     SyplecticEuler integrator;
 
     double dt = 0.5; // Timestep (seconds)

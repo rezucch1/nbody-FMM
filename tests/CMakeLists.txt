@@ -26,6 +26,21 @@ target_link_libraries(test_naive_update PRIVATE
 )
 gtest_discover_tests(test_naive_update)
 
+# 3D Naive vs FMM comparison test executable
+add_executable(test_fmm_vs_naive_3d test_fmm_vs_naive_3d.cpp)
+
+target_link_libraries(test_fmm_vs_naive_3d PRIVATE 
+    nbody_core 
+    system_updaters 
+    tree_components 
+    multipole_utils 
+    quadratures 
+    math_utils 
+    gtest_main
+)
+
+gtest_discover_tests(test_fmm_vs_naive_3d)
+
 # Tree construction 15-particle test executable
 add_executable(test_tree test_tree.cpp)
 target_link_libraries(test_tree PRIVATE 
