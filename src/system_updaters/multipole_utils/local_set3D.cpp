@@ -19,6 +19,10 @@ inline LocalSet<3>::LocalSet(unsigned int L) : LocalSetI(L){
   elements.assign(size, 0.0);
 }
 
+std::unique_ptr<LocalSetI> LocalSet<3U>::clone() const {
+  return std::make_unique<LocalSet<3>>(*this);
+}
+
 std::complex<double> LocalSet<3U>::operator()(unsigned int l, int m) const{
   unsigned int idx = 2*l*l + 2*l + 2*m;
   return std::complex<double>(elements[idx], elements[idx + 1]);
@@ -41,8 +45,8 @@ void LocalSet<3>::set_elements(unsigned int n, int m, std::complex<double> l){
   elements[idx + 1] = l.imag();
 }
 
-LocalSet<3U> *LocalSet<3U>::distribute_parent_with_distance(const Tensor &d) const{
-  auto L = new LocalSet<3>(this->L);
+std::unique_ptr<LocalSetI> LocalSet<3U>::distribute_parent_with_distance(const Tensor &d) const{
+  auto L = std::make_unique<LocalSet<3>>(this->L);
   // *L = 0;
   const auto regular = PowerSet<3>(2 * this->L, d);
 

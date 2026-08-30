@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include "base_multipole_set_i.hpp"
 #include "math_utils/tensor.hpp"
 
@@ -14,6 +15,12 @@
 class LocalSetI : public BaseMultipoleSetI {
   public:
     /**
+     * @brief Creates a deep copy clone of the local expansion set.
+     * @return Unique pointer to cloned LocalSetI instance.
+     */
+    virtual std::unique_ptr<LocalSetI> clone() const = 0;
+
+    /**
      * @brief Polymorphic in-place addition of local expansion sets.
      * @param other Pointer to another LocalSetI.
      * @return Reference to updated LocalSetI.
@@ -24,9 +31,9 @@ class LocalSetI : public BaseMultipoleSetI {
      * @brief Translates parent local expansion center to child cell center (L2L step).
      * \f[ L_{\text{child}} = \text{L2L}(L_{\text{parent}}, \mathbf{d}) \f]
      * @param d Displacement vector \f$ \mathbf{d} = \mathbf{x}_{\text{child}} - \mathbf{x}_{\text{parent}} \f$.
-     * @return Pointer to dynamically allocated translated LocalSetI.
+     * @return Unique pointer to dynamically allocated translated LocalSetI.
      */
-    virtual LocalSetI* distribute_parent_with_distance(const Tensor &d) const = 0;
+    virtual std::unique_ptr<LocalSetI> distribute_parent_with_distance(const Tensor &d) const = 0;
 
     /**
      * @brief Evaluates potential gradient \f$ \nabla \Phi(\mathbf{d}) \f$ at target offset \f$ \mathbf{d} \f$.

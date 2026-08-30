@@ -11,6 +11,10 @@ inline LocalSet<2>::LocalSet(unsigned int L) : LocalSetI(L){
   elements.assign(L + 1, {0.0, 0.0});
 }
 
+std::unique_ptr<LocalSetI> LocalSet<2>::clone() const {
+  return std::make_unique<LocalSet<2>>(*this);
+}
+
 std::complex<double> LocalSet<2>::operator()(unsigned l, int m) const{
   return elements[l];
 }
@@ -35,9 +39,9 @@ LocalSet<2> &LocalSet<2>::operator+=(const LocalSet<2> other){
   return *this;
 }
 
-LocalSet<2> *LocalSet<2>::distribute_parent_with_distance(const Tensor &d) const{
+std::unique_ptr<LocalSetI> LocalSet<2>::distribute_parent_with_distance(const Tensor &d) const{
   std::complex<double> z(d[0], d[1]);
-  auto child_local = new LocalSet<2>(L);
+  auto child_local = std::make_unique<LocalSet<2>>(L);
 
   for (unsigned int k = 0; k <= L; ++k){
     unsigned int bin_coef = 1;

@@ -100,7 +100,7 @@ class Node : public NodeI {
      * @brief Propagates parent local expansion down to children (L2L phase).
      * @param parent_local Translated local expansion from parent node.
      */
-    virtual void propagate_locals(LocalSetI *parent_local = nullptr) override;
+    virtual void propagate_locals(const LocalSetI *parent_local = nullptr) override;
 
     /**
      * @brief Gets list of neighbor nodes.

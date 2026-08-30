@@ -26,6 +26,12 @@ class LocalSet<2> : public LocalSetI {
     LocalSet(unsigned int L);
 
     /**
+     * @brief Creates a deep copy clone of the 2D local expansion set.
+     * @return Unique pointer to cloned LocalSetI instance.
+     */
+    virtual std::unique_ptr<LocalSetI> clone() const override;
+
+    /**
      * @brief Gets complex local coefficient at degree \f$ l \f$.
      * @param l Degree \f$ l \f$.
      * @param m Unused in 2D (defaults to 0).
@@ -65,9 +71,9 @@ class LocalSet<2> : public LocalSetI {
      * @brief Performs 2D L2L local shift translation to child cell center.
      * \f[ b_l^{\text{child}} = \sum_{k=l}^L \binom{k}{l} b_k^{\text{parent}} d^{k-l} \f]
      * @param d Displacement vector \f$ \mathbf{d} = \mathbf{x}_{\text{child}} - \mathbf{x}_{\text{parent}} \f$.
-     * @return Pointer to translated 2D LocalSet.
+     * @return Unique pointer to translated 2D LocalSet.
      */
-    virtual LocalSet<2> *distribute_parent_with_distance(const Tensor &d) const override;
+    virtual std::unique_ptr<LocalSetI> distribute_parent_with_distance(const Tensor &d) const override;
 
     /**
      * @brief Evaluates 2D potential gradient \f$ \nabla \Phi \f$ at target offset \f$ \mathbf{d} \f$.

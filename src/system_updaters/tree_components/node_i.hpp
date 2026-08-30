@@ -46,6 +46,8 @@ class NodeI {
     std::unique_ptr<LocalSetI> local_set;          /**< Local expansion coefficients set \f$ L_l^m \f$. */
 
   public:
+    virtual ~NodeI() = default;
+
     /**
      * @brief Retrieves parent Node reference.
      * @return Parent Node reference.
@@ -86,7 +88,7 @@ class NodeI {
      * @brief Propagates parent local expansion down to this node (L2L phase).
      * @param parent_local Translated local expansion from parent node.
      */
-    virtual void propagate_locals(LocalSetI *parent_local = nullptr);
+    virtual void propagate_locals(const LocalSetI *parent_local = nullptr);
 
   protected:
     /**

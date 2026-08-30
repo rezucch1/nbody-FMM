@@ -41,7 +41,7 @@ MultipoleSetI &MultipoleSet<3>::operator+=(const PowerSetI &z){
 
 std::unique_ptr<MultipoleSetI> MultipoleSet<3>::weigh_children_with_distance(const Tensor &d) const{
 
-    auto M = new MultipoleSet<3>(L);
+    auto M = std::make_unique<MultipoleSet<3>>(L);
     // *M = 0;
     const auto regular = PowerSet<3>(L, d);
 
@@ -78,12 +78,12 @@ std::unique_ptr<MultipoleSetI> MultipoleSet<3>::weigh_children_with_distance(con
             M->elements.push_back(m_complex.imag());
         }
     }
-    return std::unique_ptr<MultipoleSetI>(M);
+    return M;
 }
 
 std::unique_ptr<LocalSetI> MultipoleSet<3U>::to_local(const Tensor &d) const{
 
-    auto L = new LocalSet<3>(this->L);
+    auto L = std::make_unique<LocalSet<3>>(this->L);
     const auto irregular = Irregular(2 * this->L, d);
 
     for (unsigned int j = 0; j <= this->L; ++j){
@@ -109,5 +109,5 @@ std::unique_ptr<LocalSetI> MultipoleSet<3U>::to_local(const Tensor &d) const{
             L->set_elements(j, k, l_complex);
         }
     }
-    return std::unique_ptr<LocalSetI>(L);
+    return L;
 }

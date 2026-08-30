@@ -34,14 +34,16 @@ void Node::collect_multipoles_to_locals(){
       c.collect_multipoles_to_locals();
 }
 
-void Node::propagate_locals(LocalSetI *parent_local){
+void Node::propagate_locals(const LocalSetI *parent_local){
     NodeI::propagate_locals(parent_local);
 
     for (auto &c : get_children())
-      if (local_set)
-        c.propagate_locals(local_set->distribute_parent_with_distance(getMassCenter(c) - mass_center));
-      else 
+      if (local_set) {
+        auto child_shift = local_set->distribute_parent_with_distance(getMassCenter(c) - mass_center);
+        c.propagate_locals(child_shift.get());
+      } else {
         c.propagate_locals(nullptr);
+      }
 }
 
 const std::vector<NodeI *> &Node::get_neighbours() const

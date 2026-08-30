@@ -41,7 +41,7 @@ class Leaf : public NodeI {
      * @brief Propagates parent local expansion down to leaf.
      * @param parent_local Translated local expansion from parent node.
      */
-    virtual void propagate_locals(LocalSetI *parent_local = nullptr) override {
+    virtual void propagate_locals(const LocalSetI *parent_local = nullptr) override {
       NodeI::propagate_locals(parent_local);
     };
 

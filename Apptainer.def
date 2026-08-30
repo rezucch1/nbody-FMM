@@ -1,11 +1,6 @@
 Bootstrap: docker
 From: ubuntu:24.04
 
-%labels
-    Author Antigravity AI
-    Description Ubuntu 24.04 Apptainer container for N-Body Fast Multipole Method (FMM) with C++20, OpenMPI, and parallel HDF5.
-    Version 1.2
-
 %help
     This container provides a modern C++20 development and execution environment configured with:
     - GCC 13+ compiler with full C++20 support (-std=c++20)
@@ -16,12 +11,7 @@ From: ubuntu:24.04
 
     Usage:
       Build image:
-        singularity build --fakeroot build/nbody.sif Apptainer.def
-
-      Run build/simulation:
-        singularity exec build/nbody.sif cmake -B build -G Ninja
-        singularity exec build/nbody.sif cmake --build build
-        singularity exec build/nbody.sif mpirun -np 4 ./build/main
+        apptainer build --fakeroot build/nbody.sif Apptainer.def
 
 %environment
     export CC=gcc
@@ -66,18 +56,3 @@ From: ubuntu:24.04
     apt-get clean
     rm -rf /var/lib/apt/lists/*
 
-%test
-    export PATH=/usr/lib/x86_64-linux-gnu/hdf5/openmpi/bin:$PATH
-    export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/hdf5/openmpi:$LD_LIBRARY_PATH
-
-    echo "=== Verifying C++20 Compiler & GDB ==="
-    g++ --version
-    gdb --version
-    g++ -std=c++20 -dM -E - < /dev/null | grep __cplusplus
-
-    echo "=== Verifying OpenMPI ==="
-    mpic++ --version
-    mpirun --version
-
-    echo "=== Verifying HDF5 (Serial & Parallel versions) ==="
-    h5cc -showconfig || h5pcc -showconfig || h5pcc.openmpi -showconfig

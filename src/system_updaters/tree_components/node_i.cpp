@@ -118,13 +118,12 @@ void NodeI::collect_multipoles_to_locals(){
     }
 }
 
-void NodeI::propagate_locals(LocalSetI *parent_local){
+void NodeI::propagate_locals(const LocalSetI *parent_local){
     if (parent_local){
         if (local_set){
             *local_set += parent_local;
-            delete parent_local;
         }
         else
-            local_set = std::unique_ptr<LocalSetI>(parent_local);
+            local_set = parent_local->clone();
     }
 }

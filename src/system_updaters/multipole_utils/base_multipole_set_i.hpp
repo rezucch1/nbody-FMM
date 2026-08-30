@@ -23,6 +23,8 @@ class BaseMultipoleSetI {
     BaseMultipoleSetI(unsigned int L);
 
   public:
+    virtual ~BaseMultipoleSetI() = default;
+
     /**
      * @brief Accesses expansion element \f$ M_l^m \f$ or \f$ L_l^m \f$ at degree \f$ l \f$ and order \f$ m \f$.
      * @param l Degree index \f$ l \f$.

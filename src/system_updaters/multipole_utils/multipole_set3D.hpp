@@ -50,7 +50,7 @@ class MultipoleSet<3> : public MultipoleSetI {
      * @param d Displacement vector \f$ \mathbf{d} = \mathbf{x}_{\text{target}} - \mathbf{x}_{\text{source}} \f$.
      * @return Unique pointer to converted 3D LocalSet.
      */
-    virtual std::unique_ptr<LocalSetI> to_local(const Tensor &d) const;
+    virtual std::unique_ptr<LocalSetI> to_local(const Tensor &d) const override;
 
     using MultipoleSetI::operator=;
 };

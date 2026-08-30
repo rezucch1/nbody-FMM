@@ -22,6 +22,12 @@ class LocalSet<3> : public LocalSetI {
     LocalSet(unsigned int L);
 
     /**
+     * @brief Creates a deep copy clone of the 3D local expansion set.
+     * @return Unique pointer to cloned LocalSetI instance.
+     */
+    virtual std::unique_ptr<LocalSetI> clone() const override;
+
+    /**
      * @brief Gets complex local coefficient \f$ L_l^m \f$.
      * @param l Degree \f$ l \f$.
      * @param m Order \f$ m \f$.
@@ -46,9 +52,9 @@ class LocalSet<3> : public LocalSetI {
     /**
      * @brief Performs 3D L2L local shift translation to child cell center.
      * @param d Displacement vector \f$ \mathbf{d} = \mathbf{x}_{\text{child}} - \mathbf{x}_{\text{parent}} \f$.
-     * @return Pointer to translated 3D LocalSet.
+     * @return Unique pointer to translated 3D LocalSet.
      */
-    virtual LocalSet<3> *distribute_parent_with_distance(const Tensor &d) const override;
+    virtual std::unique_ptr<LocalSetI> distribute_parent_with_distance(const Tensor &d) const override;
 
     /**
      * @brief Sets element coefficient at degree \f$ n \f$ and order \f$ m \f$.
