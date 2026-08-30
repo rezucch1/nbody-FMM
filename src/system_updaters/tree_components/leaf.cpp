@@ -31,6 +31,57 @@ void Leaf::compute_multipoles(unsigned int L){
         (*multipole_set) += *z;
     }
 }
+
+
+
+void Leaf::compute_acceleration(){
+    for (const auto &i : particles){
+        Tensor grad_i = local_set->get_gradient(i->get_position() - mass_center);
+
+        // 1. Direct P2P interactions with other particles in the SAME leaf cell
+        for (const auto &j : particles) if (j != i) {
+            Tensor d = i->get_position() - j->get_position();
+
+            if (dim == 2) {
+                // 2D kernel convention kept as-is.
+                grad_i -= j->get_weight()
+                        * d / d.squared_norm();
+            }
+            else if (dim == 3) {
+                // 3D gravitational potential
+                grad_i -= j->get_weight()
+                        * d / std::pow(d.squared_norm(), 1.5);
+            }
+        }
+
+        // 2. Direct P2P interactions with particles in NEIGHBOR leaf cells
+        for (const auto &n : neighbours_list) if (n){
+            for (const auto &j : ((Leaf*)n)->particles) if (i != j){
+                Tensor d = i->get_position() - j->get_position();
+
+                if (dim == 2) {
+                    // 2D kernel convention kept as-is.
+                    grad_i -= j->get_weight()
+                            * d / d.squared_norm();
+                }
+                else if (dim == 3) {
+                    // 3D gravitational potential
+                    grad_i -= j->get_weight()
+                            * d / std::pow(d.squared_norm(), 1.5);
+                }
+            }
+        }
+        i->compute_new_accelaration(grad_i);
+    }
+}
+
+
+
+
+
+
+
+
 void Leaf::calculateMC()
 {
     double total_mass = 0;

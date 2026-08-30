@@ -15,7 +15,7 @@ Particle::Particle(double weight, Tensor &&pos, Tensor &&vel)
 
 const Tensor &Particle::compute_new_accelaration(const Tensor &potential_gradient) const{
 	
-		acceleration = GRAV_CONST * potential_gradient;
+	acceleration = GRAV_CONST * potential_gradient;
 
 	return acceleration;
 }

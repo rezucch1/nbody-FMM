@@ -30,7 +30,7 @@ MultipoleSetI &MultipoleSet<3>::operator+=(const PowerSetI &z){
     unsigned int idx = 1;
     for (unsigned int n = 1; n <= L; ++n){
         for (int m = -n; m <= (int) n; ++m){
-            auto z_complex = z(n, m);
+            auto z_complex = z(n, -m);
             elements[idx] += z_complex.real();
             elements[idx + 1] += z_complex.imag();
             idx += 2;

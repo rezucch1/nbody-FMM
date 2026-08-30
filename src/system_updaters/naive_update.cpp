@@ -22,6 +22,8 @@ void NaiveUpdate::update(const std::vector<Particle> &particles) {
                 * distance;
         }
         else if (dim == 3) {
+          // Build grad Phi = + d / r^3; the final acceleration is applied later
+          // with the single negative sign in Particle::compute_new_accelaration.
           p_gradient -= other.get_weight()
                       / ((squared_distance_norm + 1.0e-4) * distance.norm())
                       * distance;

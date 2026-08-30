@@ -76,8 +76,9 @@ std::unique_ptr<LocalSetI> LocalSet<3U>::distribute_parent_with_distance(const T
   return L;
 }
 
-Tensor LocalSet<3U>::get_gradient(const Tensor &d) const
-{
+
+/*
+Tensor LocalSet<3U>::get_gradient(const Tensor &d) const{
     Tensor gradient{0.0, 0.0, 0.0};
 
     PowerSet<3> regular(L, d);
@@ -220,3 +221,87 @@ if (std::abs(k) <= static_cast<int>(j - 1)) {
 }
 
 template class LocalSet<3>;
+*/
+
+
+
+
+
+Tensor LocalSet<3U>::get_gradient(const Tensor &d) const {
+    Tensor gradient{0.0, 0.0, 0.0};
+
+    const double x = d[0];
+    const double y = d[1];
+    const double z = d[2];
+
+    const double r2 = x * x + y * y + z * z;
+    const double r = std::sqrt(r2);
+
+    // Caso 1: r = 0 (Origine) - Restituisce +grad(Phi)
+    if (r < 1e-12) {
+        const std::complex<double> L_1_1 = (*this)(1, 1);
+        const double L_1_0 = (*this)(1, 0).real();
+
+        // Segni del GRADIENTE POSITIVO (opposti alla forza)
+        gradient[0] =  std::sqrt(2.0) * L_1_1.real(); 
+        gradient[1] = -std::sqrt(2.0) * L_1_1.imag(); 
+        gradient[2] =  L_1_0;                         
+
+        return gradient;
+    }
+
+    const double rho2 = x * x + y * y;
+    const double rho = std::sqrt(rho2);
+
+    double dPhi_dr = 0.0;
+    double dPhi_dtheta = 0.0;
+    double dPhi_dphi = 0.0;
+
+    PowerSet<3> regular(L, d); // R_n^m(d)
+
+    for (unsigned int n = 0; n <= L; ++n) {
+        for (int m = -static_cast<int>(n); m <= static_cast<int>(n); ++m) {
+            
+            const std::complex<double> L_nm = (*this)(n, m);
+            const std::complex<double> R_nm = regular(n, m);
+
+            // 1. dPhi/dr
+            if (n > 0) {
+                dPhi_dr += (L_nm * R_nm).real() * (static_cast<double>(n) / r);
+            }
+
+            // 2. dPhi/dphi
+            if (m != 0) {
+                const std::complex<double> val = L_nm * R_nm * std::complex<double>(0.0, static_cast<double>(m));
+                dPhi_dphi += val.real();
+            }
+
+            // 3. dPhi/dtheta
+            if (rho > 1e-12) {
+                double term_theta = (z / r) * static_cast<double>(n) * (L_nm * R_nm).real();
+                
+                if (n > 0 && std::abs(m) <= static_cast<int>(n - 1)) {
+                    const std::complex<double> R_n_1_m = regular(n - 1, m);
+                    const double factor = std::sqrt(static_cast<double>(n * n - m * m));
+                    term_theta -= (L_nm * R_n_1_m).real() * factor;
+                }
+                
+                dPhi_dtheta += term_theta / rho;
+            }
+        }
+    }
+
+    // Proiezione in coordinate cartesiane (+grad(Phi))
+    if (rho < 1e-12) {
+        // Asse Z: rho = 0
+        gradient[0] = 0.0;
+        gradient[1] = 0.0;
+        gradient[2] = dPhi_dr * (z >= 0.0 ? 1.0 : -1.0);
+    } else {
+        gradient[0] = (x / r) * dPhi_dr + (x * z / (r * rho)) * dPhi_dtheta - (y / (r*rho)) * dPhi_dphi;
+        gradient[1] = (y / r) * dPhi_dr + (y * z / (r * rho)) * dPhi_dtheta + (x / (r*rho)) * dPhi_dphi;
+        gradient[2] = (z / r) * dPhi_dr - (rho / r) * dPhi_dtheta;
+    }
+
+    return gradient;
+}
