@@ -32,6 +32,8 @@ void Leaf::compute_multipoles(unsigned int L){
     }
 }
 
+
+
 void Leaf::compute_acceleration(){
     for (const auto &i : particles){
         Tensor grad_i = local_set->get_gradient(i->get_position() - mass_center);
@@ -41,13 +43,13 @@ void Leaf::compute_acceleration(){
             Tensor d = i->get_position() - j->get_position();
 
             if (dim == 2) {
-                // Kernel: -log(r)
+                // 2D kernel convention kept as-is.
                 grad_i -= j->get_weight()
                         * d / d.squared_norm();
             }
             else if (dim == 3) {
-                // Kernel: 1/r
-                grad_i += j->get_weight()
+                // 3D gravitational potential
+                grad_i -= j->get_weight()
                         * d / std::pow(d.squared_norm(), 1.5);
             }
         }
@@ -58,13 +60,13 @@ void Leaf::compute_acceleration(){
                 Tensor d = i->get_position() - j->get_position();
 
                 if (dim == 2) {
-                    // Kernel: -log(r)
+                    // 2D kernel convention kept as-is.
                     grad_i -= j->get_weight()
                             * d / d.squared_norm();
                 }
                 else if (dim == 3) {
-                    // Kernel: 1/r
-                    grad_i += j->get_weight()
+                    // 3D gravitational potential
+                    grad_i -= j->get_weight()
                             * d / std::pow(d.squared_norm(), 1.5);
                 }
             }
@@ -72,6 +74,13 @@ void Leaf::compute_acceleration(){
         i->compute_new_accelaration(grad_i);
     }
 }
+
+
+
+
+
+
+
 
 void Leaf::calculateMC()
 {

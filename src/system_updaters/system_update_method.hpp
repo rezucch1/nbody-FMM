@@ -15,6 +15,7 @@ class SystemUpdateMethod;
  * @brief Universal gravitational constant \f$ G = 6.6743 \times 10^{-11} \, \text{m}^3 \text{kg}^{-1} \text{s}^{-2} \f$.
  */
 constexpr double GRAV_CONST = 6.6743e-11;
+// constexpr double GRAV_CONST = 1.0;       // G = 1
 
 /**
  * @class SystemUpdateMethod
