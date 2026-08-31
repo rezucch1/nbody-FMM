@@ -18,6 +18,11 @@
 class Tree {
   public:
     /**
+     * @brief Default constructor.
+     */
+    Tree() = default;
+
+    /**
      * @brief Constructs FMM tree over a particle iterator range.
      * @tparam InputIt Iterator type pointing to Particle.
      * @param begin Start iterator.

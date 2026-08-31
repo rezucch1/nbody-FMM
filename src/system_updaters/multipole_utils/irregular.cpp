@@ -5,6 +5,7 @@
 
 #include "irregular.hpp"
 #include <cmath>
+#include <cassert>
 
 Irregular::Irregular(unsigned int L, const Tensor &r)
 : PowerSetI(L)
@@ -42,6 +43,7 @@ Irregular::Irregular(unsigned int L, const Tensor &r)
 
 std::complex<double> Irregular::operator()(unsigned l, int m) const
 {
+    assert(-(int)l <= m && m <= (int)l);
     if (m == 0)
         return std::complex<double>(elements[l*l], 0);
     else if (m > 0)

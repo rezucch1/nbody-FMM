@@ -6,6 +6,8 @@
 #include "multipole_set3D.hpp"
 #include "irregular.hpp"
 
+#include <cassert>
+
 constexpr std::complex<double> imaginary_power[] = {
     {1, 0},
     {0, 1},
@@ -19,6 +21,7 @@ inline MultipoleSet<3>::MultipoleSet(unsigned int L)
 }
 
 std::complex<double> MultipoleSet<3>::operator()(unsigned l, int m) const{
+    assert(-(int)l <= m && m <= (int)l);
     if (l == 0)
         return std::complex<double>(elements[0], 0.0);
     unsigned int idx = 2*l*l + 2*l + 2*m - 1;
@@ -76,6 +79,7 @@ std::unique_ptr<MultipoleSetI> MultipoleSet<3>::weigh_children_with_distance(con
             }
             M->elements.push_back(m_complex.real());
             M->elements.push_back(m_complex.imag());
+            assert((*M)(j, k) == m_complex);
         }
     }
     return M;
@@ -96,17 +100,18 @@ std::unique_ptr<LocalSetI> MultipoleSet<3U>::to_local(const Tensor &d) const{
                 sign = -sign;
                 double A = A_row;
                 l_complex += (double)sign * (*this)(n, 0) * A * irregular(j + n, -k);
-                for (int m = - 1; m >= -n; --m){
+                for (int m = - 1; m >= -(int)n; --m){
                     A *= sqrt(((double)((n - m + j + k)*(n + m + 1))/((n + m + j - k + 1)*(n - m))));
                     l_complex += (double)sign * (*this)(n, m) * imaginary_power[(4 + (std::abs(k - m) - std::abs(k) - std::abs(m)) % 4) % 4] * A * irregular(j+n, m-k);
                 }
                 A = A_row;
-                for (int m = 1; m <= n; ++m ){
+                for (int m = 1; m <= (int)n; ++m ){
                     A *= sqrt(((double)((n + m + j - k)*(n - m + 1))/((n - m + j + k + 1)*(n + m))));
                     l_complex += (double)sign * (*this)(n, m) * imaginary_power[(4 + (std::abs(k - m) - std::abs(k) - std::abs(m)) % 4) % 4] * A * irregular(j+n, m-k);
                 }
             }
             L->set_elements(j, k, l_complex);
+            assert((*L)(j, k) == l_complex);
         }
     }
     return L;

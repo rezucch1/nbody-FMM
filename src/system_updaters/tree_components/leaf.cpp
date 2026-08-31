@@ -6,6 +6,8 @@
 #include "leaf.hpp"
 #include "multipole_set.hpp"
 
+#include <cassert>
+
 Leaf::Leaf(std::vector<std::unordered_map<uint64_t, std::unique_ptr<NodeI>>> &allocator, unsigned int depth, uint64_t id_child, std::vector<const Particle *>::const_iterator particles_begin, std::vector<const Particle *>::const_iterator particles_end)
     : NodeI(allocator, depth, id_child, (*particles_begin)->get_position().dim)
     , particles(particles_begin, particles_end){}
@@ -105,6 +107,7 @@ void Leaf::compute_acceleration(){
             grad_i = Tensor{0.0, 0.0, 0.0};
 
             // FMM: contributo del local expansion
+            assert (local_set);
             if (local_set) {
                 Tensor d = i->get_position() - mass_center;
 

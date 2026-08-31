@@ -91,8 +91,16 @@ void Tree::init_tree(const Particle *begin, const Particle *end)
 }
 
 void Tree::compute_accelerations(){
+  unsigned int L = 8;
   
-  nodes_vector[0][0]->compute_multipoles(2);
+  for (int d = (int)nodes_vector.size() - 1; d >= 0; --d) {
+    for (auto &[idx, node] : nodes_vector[d]) {
+      if (node) {
+        node->compute_multipoles(L);
+      }
+    }
+  }
+
   nodes_vector[0][0]->collect_multipoles_to_locals();
   nodes_vector[0][0]->propagate_locals();
 

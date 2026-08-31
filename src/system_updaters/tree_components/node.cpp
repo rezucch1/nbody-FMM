@@ -12,10 +12,6 @@ Node::Node(std::vector<std::unordered_map<uint64_t, std::unique_ptr<NodeI>>> &al
 }
 
 void Node::compute_multipoles(unsigned int L){
-
-    for (auto &c : get_children())
-      c.compute_multipoles(L);
-
     calculateMC();
     if (dim == 2)
       multipole_set = std::make_unique<MultipoleSet<2>>(L);

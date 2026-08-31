@@ -5,6 +5,7 @@
 
 #include "local_set3D.hpp"
 #include "power_set3D.hpp"
+#include <cassert>
 
 constexpr std::complex<double> imaginary_power[] = {
   {1, 0},
@@ -25,6 +26,7 @@ std::unique_ptr<LocalSetI> LocalSet<3U>::clone() const {
 
 std::complex<double> LocalSet<3U>::operator()(unsigned int l, int m) const{
   unsigned int idx = 2*l*l + 2*l + 2*m;
+  assert(-(int)l <= m && m <= (int)l);
   return std::complex<double>(elements[idx], elements[idx + 1]);
 }
 
@@ -40,6 +42,7 @@ LocalSet<3> &LocalSet<3>::operator+=(const LocalSet<3> other){
 }
 
 void LocalSet<3>::set_elements(unsigned int n, int m, std::complex<double> l){
+  assert(-(int)n <= m && m <= (int)n);
   unsigned int idx = 2*n*n + 2*n + 2*m;
   elements[idx] = l.real();
   elements[idx + 1] = l.imag();
@@ -51,26 +54,27 @@ std::unique_ptr<LocalSetI> LocalSet<3U>::distribute_parent_with_distance(const T
   const auto regular = PowerSet<3>(2 * this->L, d);
 
   for (unsigned int j = 0; j <= this->L; ++j){
-    for (int k = -j; k <= j; ++k){
+    for (int k = -j; k <= (int)j; ++k){
       double A_row = 1;
       int sign = 1;
       std::complex<double> l_complex = (*this)(j, k) * regular(0, 0);
       for (unsigned int n = j + 1; n <= this->L; ++n){
         A_row *= std::sqrt((n - k)*(n + k)) / (n - j);
-        sign = -sign;
+        sign = (n+j)%2 ? -1 : 1;
         double A = A_row;
         l_complex += (double)sign * (*this)(n, k) * A * regular(n - j, 0);
-        for (int m = k - 1; m >= k - n + j; --m){
+        for (int m = k - 1; m >= -(int)n && m >= k - n + j; --m){
           A *= sqrt((double)((n - m)*(n + m -j - k + 1))/((n + m + 1)*(n - m - j + k)));
           l_complex += (double)sign * (*this)(n, m) * imaginary_power[(4 + (std::abs(m) - std::abs(m - k) - std::abs(k)) % 4) % 4] * A * regular(n - j, m - k);
         }
         A = A_row;
-        for (int m = k + 1; m <= k + n - j; ++m ){
+        for (int m = k + 1; m <= (int)n && m <= k + n - j; ++m ){
           A *= sqrt((double)((n + m)*(n - m - j + k + 1))/((n - m + 1)*(n + m - j - k)));
           l_complex += (double)sign * (*this)(n, m) * imaginary_power[(4 + (std::abs(m) - std::abs(m - k) - std::abs(k)) % 4) % 4] * A * regular(n - j, m - k);
         }
       }
       L->set_elements(j, k, l_complex);
+      assert((*L)(j, k) == l_complex);
     }
   }
   return L;
