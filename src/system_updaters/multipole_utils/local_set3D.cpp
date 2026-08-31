@@ -203,7 +203,7 @@ if (std::abs(k) <= static_cast<int>(j - 1)) {
 }
             gradient[0] += (L_jk * dRdx).real();
             gradient[1] += (L_jk * dRdy).real();
-            gradient[2] += (L_jk * dRdz).real();
+            gradient[2] -= (L_jk * dRdz).real();
         }
     }
     return gradient;
