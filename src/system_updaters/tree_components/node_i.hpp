@@ -49,6 +49,12 @@ class NodeI {
     virtual ~NodeI() = default;
 
     /**
+     * @brief Checks if this node is a remote ghost cell.
+     * @return True if ghost node, false if local node.
+     */
+    virtual bool is_ghost() const { return false; }
+
+    /**
      * @brief Retrieves parent Node reference.
      * @return Parent Node reference.
      */

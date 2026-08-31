@@ -33,5 +33,17 @@ class BaseMultipoleSetI {
      */
     virtual std::complex<double> operator()(unsigned l, int m = 0) const = 0;
 
+    /**
+     * @brief Gets raw coefficient elements vector.
+     * @return Const reference to elements vector.
+     */
+    const std::vector<double> &get_elements() const { return elements; }
+
+    /**
+     * @brief Sets raw coefficient elements vector.
+     * @param elems Elements vector to set.
+     */
+    void set_elements(const std::vector<double> &elems) { elements = elems; }
+
     friend class MultipoleSetI;
 };
