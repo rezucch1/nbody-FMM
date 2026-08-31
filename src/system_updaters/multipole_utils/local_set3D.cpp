@@ -63,12 +63,12 @@ std::unique_ptr<LocalSetI> LocalSet<3U>::distribute_parent_with_distance(const T
         sign = (n+j)%2 ? -1 : 1;
         double A = A_row;
         l_complex += (double)sign * (*this)(n, k) * A * regular(n - j, 0);
-        for (int m = k - 1; m >= -(int)n && m >= k - n + j; --m){
+        for (int m = k - 1; m >= (int)(k - n + j); --m){
           A *= sqrt((double)((n - m)*(n + m -j - k + 1))/((n + m + 1)*(n - m - j + k)));
           l_complex += (double)sign * (*this)(n, m) * imaginary_power[(4 + (std::abs(m) - std::abs(m - k) - std::abs(k)) % 4) % 4] * A * regular(n - j, m - k);
         }
         A = A_row;
-        for (int m = k + 1; m <= (int)n && m <= k + n - j; ++m ){
+        for (int m = k + 1; m <= (int)(k + n - j); ++m ){
           A *= sqrt((double)((n + m)*(n - m - j + k + 1))/((n - m + 1)*(n + m - j - k)));
           l_complex += (double)sign * (*this)(n, m) * imaginary_power[(4 + (std::abs(m) - std::abs(m - k) - std::abs(k)) % 4) % 4] * A * regular(n - j, m - k);
         }
