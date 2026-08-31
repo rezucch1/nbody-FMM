@@ -114,7 +114,7 @@ void Leaf::compute_acceleration(){
                 grad_i += local_set->get_gradient(d);
 
             }
-
+            
             // P2P: particelle nella stessa leaf
             for (const auto &j : particles) {
                 if (j != i) {

@@ -28,7 +28,7 @@ constexpr double DOMAIN_BOUND = 100.0;
 constexpr double MAX_MASS = 1.0e10;
 constexpr double MAX_VEL = 0.0;
 
-constexpr unsigned int DIM = 3;
+constexpr unsigned int DIM = 2;
 
 std::unique_ptr<QuadratureMethod> quadrature_method(new SyplecticEuler());
 std::unique_ptr<SystemUpdateMethod> update_method(new FMM());
