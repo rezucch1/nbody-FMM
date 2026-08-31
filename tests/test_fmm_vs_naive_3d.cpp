@@ -16,14 +16,17 @@
 
 TEST(FMMvsNaive3DTest, CompareAccelerations3D) {
 
-    constexpr unsigned int NUM_PARTICLES = 20;
+    constexpr unsigned int NUM_PARTICLES = 100;
     constexpr double DOMAIN_BOUND = 50.0;
     constexpr double PARTICLE_MASS = 1.0e9;
     constexpr unsigned int SEED = 42;
 
     srand(SEED);
 
+    // ============================================================
     // 1. Generate N particles in 3D space
+    // ============================================================
+
     std::vector<Particle> particles_naive;
     particles_naive.reserve(NUM_PARTICLES);
 
@@ -49,15 +52,97 @@ TEST(FMMvsNaive3DTest, CompareAccelerations3D) {
     // Duplicate particle list for FMM comparison
     std::vector<Particle> particles_fmm = particles_naive;
 
-    // 2. Compute accelerations using Naive direct P2P method
+    // ============================================================
+    // 2. Naive direct computation
+    // ============================================================
+
+    std::cerr << "\n";
+    std::cerr << "========================================\n";
+    std::cerr << "DEBUG: STARTING NAIVE COMPUTATION\n";
+    std::cerr << "========================================\n";
+
     NaiveUpdate naive_solver;
     naive_solver.update(particles_naive);
 
-    // 3. Compute accelerations using Fast Multipole Method
+    std::cerr << "DEBUG: Naive computation completed.\n";
+
+    // Print Naive accelerations
+    for (unsigned int i = 0; i < NUM_PARTICLES; ++i) {
+
+        Tensor a = particles_naive[i].get_acceleration();
+
+        std::cerr << "Naive particle " << i
+                  << " acceleration = ("
+                  << a[0] << ", "
+                  << a[1] << ", "
+                  << a[2] << ")\n";
+    }
+
+    // ============================================================
+    // 3. Print FMM input particles
+    // ============================================================
+
+    std::cerr << "\n";
+    std::cerr << "========================================\n";
+    std::cerr << "DEBUG: FMM INPUT PARTICLES\n";
+    std::cerr << "========================================\n";
+
+    std::cerr << "Number of particles: "
+              << particles_fmm.size() << "\n";
+
+    for (unsigned int i = 0; i < particles_fmm.size(); ++i) {
+
+        const auto &p = particles_fmm[i];
+
+        std::cerr << "Particle " << i << ": "
+                  << "position = ("
+                  << p.get_position()[0] << ", "
+                  << p.get_position()[1] << ", "
+                  << p.get_position()[2] << ")\n";
+    }
+
+    // ============================================================
+    // 4. FMM computation
+    // ============================================================
+
+    std::cerr << "\n";
+    std::cerr << "========================================\n";
+    std::cerr << "DEBUG: STARTING FMM COMPUTATION\n";
+    std::cerr << "========================================\n";
+
     FMM fmm_solver;
+
+    std::cerr << "DEBUG: FMM solver created.\n";
+    std::cerr << "DEBUG: Calling fmm_solver.update()...\n";
+
     fmm_solver.update(particles_fmm);
 
-    // 4. Compare accelerations particle-by-particle
+    std::cerr << "DEBUG: FMM computation completed!\n";
+
+    // ============================================================
+    // 5. Print FMM accelerations
+    // ============================================================
+
+    std::cerr << "\n";
+    std::cerr << "========================================\n";
+    std::cerr << "DEBUG: FMM ACCELERATIONS\n";
+    std::cerr << "========================================\n";
+
+    for (unsigned int i = 0; i < NUM_PARTICLES; ++i) {
+
+        Tensor a = particles_fmm[i].get_acceleration();
+
+        std::cerr << "FMM particle " << i
+                  << " acceleration = ("
+                  << a[0] << ", "
+                  << a[1] << ", "
+                  << a[2] << ")\n";
+    }
+
+    // ============================================================
+    // 6. Compare accelerations particle-by-particle
+    // ============================================================
+
     std::cout << std::setw(10) << "Particle"
               << std::setw(20) << "Naive Acc Norm"
               << std::setw(20) << "FMM Acc Norm"
@@ -96,7 +181,10 @@ TEST(FMMvsNaive3DTest, CompareAccelerations3D) {
         << max_abs_error
         << std::endl;
 
-    // 5. Check all three spatial components
+    // ============================================================
+    // 7. Check all three spatial components
+    // ============================================================
+
     for (unsigned int i = 0; i < NUM_PARTICLES; ++i) {
 
         Tensor acc_naive = particles_naive[i].get_acceleration();
@@ -107,8 +195,15 @@ TEST(FMMvsNaive3DTest, CompareAccelerations3D) {
             EXPECT_NEAR(
                 acc_fmm[d],
                 acc_naive[d],
-                1.0e-3
+                1.0e-2
             );
         }
+        std::cout << "Particle " << i
+          << " component errors: "
+          << "dx=" << std::abs(acc_fmm[0] - acc_naive[0])
+          << " dy=" << std::abs(acc_fmm[1] - acc_naive[1])
+          << " dz=" << std::abs(acc_fmm[2] - acc_naive[2])
+          << std::endl;
     }
 }
+

@@ -29,7 +29,7 @@ void Tree::init_tree(const Particle *begin, const Particle *end)
     }
   }
 
-  unsigned int threshold = 5;
+  unsigned int threshold = 20;
   unsigned int dim = begin->get_position().dim;
 
   unsigned int max_n_particles = end - begin;
@@ -91,7 +91,7 @@ void Tree::init_tree(const Particle *begin, const Particle *end)
 }
 
 void Tree::compute_accelerations(){
-  unsigned int L = 8;
+  unsigned int L = 2;
   
   for (int d = (int)nodes_vector.size() - 1; d >= 0; --d) {
     for (auto &[idx, node] : nodes_vector[d]) {
