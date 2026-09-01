@@ -6,6 +6,8 @@
 
 An advanced, high-performance C++20 implementation of the **Fast Multipole Method (FMM)** for 2D and 3D N-body gravitational and electrostatic particle simulations. This project features exact near-field direct summation, high-order far-field multipole expansions, multiple ODE time-integration schemes, and **HDF5/XDMF** visualization output compatible with ParaView and VisIt.
 
+![FMM Particle Simulation Animation](assets/gif_balls.gif)
+
 ### Authors & Team Members (Politecnico di Milano)
 - **Annea Reyes**
 - **Andrei Tomita**
