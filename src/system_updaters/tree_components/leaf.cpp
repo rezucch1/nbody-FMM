@@ -78,6 +78,9 @@ void Leaf::compute_acceleration(){
                     Tensor d = i->get_position() - j->get_position();
 
                     // Kernel: -log(r)
+                    // REVIEW: coincident but distinct particles yield a zero
+                    // denominator here. Apply the same documented softening policy
+                    // as the direct solver, or reject coincident input explicitly.
                     grad_i -= j->get_weight()
                             * d / d.squared_norm();
                 }
@@ -121,6 +124,9 @@ void Leaf::compute_acceleration(){
                     Tensor d = i->get_position() - j->get_position();
 
                     // Kernel: 1/r
+                    // REVIEW: this is unsoftened while NaiveUpdate uses a softened
+                    // force. Share one kernel implementation/policy so FMM and direct
+                    // regression results describe the same physical system.
                     grad_i -= j->get_weight()
                             * d / std::pow(d.squared_norm(), 1.5);
                 }

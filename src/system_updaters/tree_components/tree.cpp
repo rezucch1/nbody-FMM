@@ -46,6 +46,9 @@ void Tree::init_tree(const Particle *begin, const Particle *end)
     if (depth > max_depth) depth = max_depth;
     n_leafs = (uint64_t)1 << (depth * dim);
     n_leafs_dim = (uint64_t)1 << depth;
+    // REVIEW: a zero-width bounding-box axis makes leaf_size[i] zero and the
+    // coordinate conversion below divides by zero. Handle degenerate axes (or
+    // pad the bounding box) before assigning Morton coordinates.
     leaf_size = (b - a) / n_leafs_dim;
 
     p_count.clear();
@@ -91,6 +94,9 @@ void Tree::init_tree(const Particle *begin, const Particle *end)
 }
 
 void Tree::compute_accelerations(){
+  // REVIEW: L=2 is a hard-coded, very low expansion order; it does not provide a
+  // controllable accuracy/cost trade-off and is inconsistent with ParallelTree's L=8.
+  // Make it an FMM configuration parameter and validate accuracy against direct P2P.
   unsigned int L = 2;
   
   for (int d = (int)nodes_vector.size() - 1; d >= 0; --d) {

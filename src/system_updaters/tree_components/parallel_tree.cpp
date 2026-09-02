@@ -402,6 +402,10 @@ void ParallelTree::compute_parallel_accelerations() {
             std::vector<double> recv_acc_buffer(total_acc_fields, 0.0);
             MPI_Allgatherv(local_acc_buffer.data(), send_count, MPI_DOUBLE,
                            recv_acc_buffer.data(), recv_counts.data(), displs.data(), MPI_DOUBLE, MPI_COMM_WORLD);
+            // REVIEW: recv_acc_buffer is discarded, so remote accelerations never
+            // reach the replicated particle array. Moreover local_acc_buffer is in
+            // unordered-map/Morton order, not particle-index order. Exchange explicit
+            // particle IDs with accelerations and unpack them deterministically.
         }
     }
 }

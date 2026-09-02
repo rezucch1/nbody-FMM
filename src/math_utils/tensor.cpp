@@ -33,6 +33,9 @@ Tensor::Tensor(Tensor &&other) noexcept
 
 Tensor &Tensor::operator=(const Tensor &other){
   this->dim = other.dim;
+  // REVIEW: reserve() changes capacity only; data.size() may remain too small, so
+  // the memcpy below writes outside the vector's constructed range. Use
+  // data = other.data (or resize(dim) before copying) instead.
   data.reserve(dim);
   std::memcpy(data.data(), other.data.data(), sizeof(double) * dim);
   return *this;

@@ -24,6 +24,9 @@ void NaiveUpdate::update(const std::vector<Particle> &particles) {
         else if (dim == 3) {
           // Build grad Phi = + d / r^3; the final acceleration is applied later
           // with the single negative sign in Particle::compute_new_accelaration.
+          // REVIEW: the softened denominator is (r^2 + eps^2) * r, whereas the
+          // usual Plummer force is (r^2 + eps^2)^(3/2). This also differs from
+          // Leaf::compute_acceleration(), so NaiveUpdate is not a consistent FMM oracle.
           p_gradient -= other.get_weight()
                       / ((squared_distance_norm + 1.0e-4) * distance.norm())
                       * distance;

@@ -27,8 +27,11 @@ class Tree {
      * @tparam InputIt Iterator type pointing to Particle.
      * @param begin Start iterator.
      * @param end End iterator.
-     */
+    */
     template <class InputIt>
+    // REVIEW: &*end dereferences the past-the-end iterator (undefined behaviour),
+    // and this assumes contiguous Particle storage despite the generic iterator API.
+    // Accept a span/vector or pass begin plus std::distance(begin, end) instead.
     Tree(InputIt begin, InputIt end) { init_tree(&*begin, &*end); };
 
     /**

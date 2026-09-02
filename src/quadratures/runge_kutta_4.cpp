@@ -10,6 +10,9 @@
 void RungeKutta4::integrate(SystemUpdateMethod *method, std::vector<Particle> &particles, const double &delta_t){
   // a_k1 + 2a_k2 + 2a_k3 + a_k4
   std::vector<Tensor> accelerations_sum;
+  // REVIEW: these vectors are indexed from 0 below after reserve(), but reserve()
+  // does not create elements. Construct/resize all three vectors to particles.size()
+  // before indexing; the present code has undefined behaviour on every non-empty step.
   accelerations_sum.reserve(particles.size());
 
   // v_k1 + 2v_k2 + 2v_k3 + v_k4

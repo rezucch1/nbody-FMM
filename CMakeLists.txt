@@ -11,12 +11,17 @@ if(ENABLE_COVERAGE)
     add_compile_options(--coverage -O0 -g)
     add_link_options(--coverage)
 else()
+    # REVIEW: forcing -O0 -g in every non-coverage build invalidates the project's
+    # high-performance claim and overrides Release optimization. Let CMake build
+    # types select flags; keep debug/coverage flags opt-in.
     add_compile_options(-O0 -g)
 endif()
 
 find_package(MPI REQUIRED)
 find_package(HDF5 REQUIRED COMPONENTS C)
 
+# REVIEW: this duplicates the unconditional debug flags above. Remove both
+# non-coverage occurrences so CMAKE_BUILD_TYPE=Release can enable optimization.
 add_compile_options(-O0 -g)
 include_directories(src ${HDF5_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_PATH})
 
