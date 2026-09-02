@@ -40,9 +40,13 @@ void ParallelTree::init_parallel_tree(const Particle *begin, const Particle *end
     Tensor global_a(dim);
     Tensor global_b(dim);
 
-    // MPI_Allreduce for global min and max bounds
-    MPI_Allreduce(&local_min[0], &global_a[0], dim, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
-    MPI_Allreduce(&local_max[0], &global_b[0], dim, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    if (num_ranks > 1) {
+        MPI_Allreduce(&local_min[0], &global_a[0], dim, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
+        MPI_Allreduce(&local_max[0], &global_b[0], dim, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+    } else {
+        global_a = local_min;
+        global_b = local_max;
+    }
 
     // ---------------------------------------------------------------------
     // STEP 2: Coarse Branch Domain Boundaries for this Rank
@@ -61,7 +65,7 @@ void ParallelTree::init_parallel_tree(const Particle *begin, const Particle *end
     unsigned int max_n_particles = num_particles;
     uint64_t n_leafs;
     unsigned int depth = 0;
-    unsigned int max_depth = ((64 / dim) >> dim) >> dim;
+    unsigned int max_depth = ((64 / dim) >> dim) << dim;
     uint64_t n_leafs_dim;
     Tensor leaf_size;
 
@@ -80,8 +84,13 @@ void ParallelTree::init_parallel_tree(const Particle *begin, const Particle *end
         unsigned int max_n_particles_local = 0;
 
         for (unsigned int i = 0; i < dim; ++i) {
-            min_local[i] = coarse_coor[i] << (depth - d_coarse);
-            max_local[i] = ((coarse_coor[i] + 1) << (depth - d_coarse)) - 1;
+            if (num_ranks == 1 || depth <= d_coarse) {
+                min_local[i] = 0;
+                max_local[i] = n_leafs_dim - 1;
+            } else {
+                min_local[i] = coarse_coor[i] << (depth - d_coarse);
+                max_local[i] = ((coarse_coor[i] + 1) << (depth - d_coarse)) - 1;
+            }
 
             min_ghost[i] = (min_local[i] > 1) ? min_local[i] - 2 : 0;
             max_ghost[i] = std::min((uint64_t)max_local[i] + 2, n_leafs_dim - 1);
@@ -126,8 +135,11 @@ void ParallelTree::init_parallel_tree(const Particle *begin, const Particle *end
             }
         }
 
-        // Synchronize max local particles per leaf across ALL ranks
-        MPI_Allreduce(&max_n_particles_local, &max_n_particles, 1, MPI_UNSIGNED, MPI_MAX, MPI_COMM_WORLD);
+        if (num_ranks > 1) {
+            MPI_Allreduce(&max_n_particles_local, &max_n_particles, 1, MPI_UNSIGNED, MPI_MAX, MPI_COMM_WORLD);
+        } else {
+            max_n_particles = max_n_particles_local;
+        }
 
     } while (depth < max_depth && max_n_particles > THRESHOLD);
 
@@ -137,7 +149,7 @@ void ParallelTree::init_parallel_tree(const Particle *begin, const Particle *end
     nodes_vector.resize(depth + 1);
 
     for (const auto &[idx, particles_list] : p_count) {
-        bool is_local = (idx >> ((depth - d_coarse) * dim)) == (uint64_t)this->rank;
+        bool is_local = (num_ranks == 1 || depth < d_coarse) ? true : ((idx >> ((depth - d_coarse) * dim)) == (uint64_t)this->rank);
         NodeI *node = nullptr;
         if (is_local) {
             node = new Leaf(nodes_vector, depth, idx, particles_list.begin(), particles_list.end());
@@ -150,7 +162,7 @@ void ParallelTree::init_parallel_tree(const Particle *begin, const Particle *end
         uint64_t parent_key = idx;
         for (int d = (int)depth - 1; d >= 0; --d) {
             parent_key >>= dim;
-            bool is_parent_local = (d < (int)d_coarse) || ((parent_key >> ((d - d_coarse) * dim)) == (uint64_t)this->rank);
+            bool is_parent_local = (num_ranks == 1 || d < (int)d_coarse) ? true : ((parent_key >> ((d - d_coarse) * dim)) == (uint64_t)this->rank);
 
             if (nodes_vector[d].find(parent_key) == nodes_vector[d].end()) {
                 if (is_parent_local) {
@@ -174,8 +186,7 @@ void ParallelTree::init_parallel_tree(const Particle *begin, const Particle *end
 }
 
 void ParallelTree::scatter_coarse_multipoles(unsigned int L) {
-    if (nodes_vector.empty()) return;
-
+    if (nodes_vector.empty() || num_ranks <= 1) return;
     if (d_coarse >= nodes_vector.size()) return;
 
     // Extract local coarse branch multipole elements vector
@@ -231,9 +242,9 @@ void ParallelTree::scatter_coarse_multipoles(unsigned int L) {
 }
 
 void ParallelTree::scatter_deep_ghost_multipoles(unsigned int L) {
-    if (nodes_vector.empty()) return;
+    if (nodes_vector.empty() || num_ranks <= 1) return;
 
-    // 1. Pack local deep node multipoles (d > d_coarse) per target rank
+    // Pack local deep node multipoles (d > d_coarse) per target rank
     std::vector<std::vector<double>> send_buffers(num_ranks);
 
     for (size_t d = d_coarse + 1; d < nodes_vector.size(); ++d) {
@@ -246,7 +257,7 @@ void ParallelTree::scatter_deep_ghost_multipoles(unsigned int L) {
                     const auto &elems = ms->get_elements();
 
                     // Determine target neighbor rank for this boundary node
-                    uint64_t coarse_branch_id = idx >> ((d - d_coarse) * dim);
+                    uint64_t coarse_branch_id = (d >= d_coarse) ? (idx >> ((d - d_coarse) * dim)) : rank;
                     for (int r = 0; r < num_ranks; ++r) {
                         if (r != rank && std::abs((int)coarse_branch_id - r) <= 1) {
                             auto &buf = send_buffers[r];
@@ -264,7 +275,7 @@ void ParallelTree::scatter_deep_ghost_multipoles(unsigned int L) {
         }
     }
 
-    // 2. Exchange buffer size counts with neighbor ranks using non-blocking MPI
+    // Exchange buffer size counts with neighbor ranks using non-blocking MPI
     std::vector<int> send_counts(num_ranks, 0);
     std::vector<int> recv_counts(num_ranks, 0);
     std::vector<MPI_Request> requests;
@@ -282,7 +293,7 @@ void ParallelTree::scatter_deep_ghost_multipoles(unsigned int L) {
     }
     requests.clear();
 
-    // 3. Post non-blocking data sends and receives to targeted neighbor ranks
+    // Post non-blocking data sends and receives to targeted neighbor ranks
     std::vector<std::vector<double>> recv_buffers(num_ranks);
 
     for (int r = 0; r < num_ranks; ++r) {
@@ -301,7 +312,7 @@ void ParallelTree::scatter_deep_ghost_multipoles(unsigned int L) {
         MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
     }
 
-    // 4. Unpack received targeted multipoles and assign to local GhostNodeI cells
+    // Unpack received targeted multipoles and assign to local GhostNodeI cells
     for (int r = 0; r < num_ranks; ++r) {
         if (r == rank || recv_buffers[r].empty()) continue;
 
@@ -350,10 +361,10 @@ void ParallelTree::compute_parallel_accelerations() {
     }
 
     // 2. Scatter coarse branch multipoles at d_coarse across all ranks via MPI_Allgather
-    scatter_coarse_multipoles(L);
+    if (num_ranks > 1) scatter_coarse_multipoles(L);
 
     // 3. Scatter deep ghost node multipoles (d > d_coarse) near process boundaries
-    scatter_deep_ghost_multipoles(L);
+    if (num_ranks > 1) scatter_deep_ghost_multipoles(L);
 
     // 4. Collect M2L local expansions and propagate L2L
     nodes_vector[0][0]->collect_multipoles_to_locals();
@@ -375,40 +386,22 @@ void ParallelTree::compute_parallel_accelerations() {
         }
     }
 
-    int send_count = (int)local_acc_buffer.size();
-    std::vector<int> recv_counts(num_ranks, 0);
-    MPI_Allgather(&send_count, 1, MPI_INT, recv_counts.data(), 1, MPI_INT, MPI_COMM_WORLD);
+    if (num_ranks > 1) {
+        int send_count = (int)local_acc_buffer.size();
+        std::vector<int> recv_counts(num_ranks, 0);
+        MPI_Allgather(&send_count, 1, MPI_INT, recv_counts.data(), 1, MPI_INT, MPI_COMM_WORLD);
 
-    std::vector<int> displs(num_ranks, 0);
-    int total_acc_fields = 0;
-    for (int r = 0; r < num_ranks; ++r) {
-        displs[r] = total_acc_fields;
-        total_acc_fields += recv_counts[r];
-    }
+        std::vector<int> displs(num_ranks, 0);
+        int total_acc_fields = 0;
+        for (int r = 0; r < num_ranks; ++r) {
+            displs[r] = total_acc_fields;
+            total_acc_fields += recv_counts[r];
+        }
 
-    if (total_acc_fields == 0) return;
-
-    std::vector<double> recv_acc_buffer(total_acc_fields, 0.0);
-    MPI_Allgatherv(local_acc_buffer.data(), send_count, MPI_DOUBLE,
-                   recv_acc_buffer.data(), recv_counts.data(), displs.data(), MPI_DOUBLE, MPI_COMM_WORLD);
-
-    // Unpack accelerations into particles owned by each local leaf
-    size_t i = 0;
-    for (int r = 0; r < num_ranks; ++r) {
-        int r_fields = recv_counts[r];
-        int r_start = displs[r];
-        int r_end = r_start + r_fields;
-        int field_idx = r_start;
-
-        // Populate acceleration values from received MPI buffer
-        for (const auto &[idx, l] : *(nodes_vector.end() - 1)) {
-            if (l) {
-                if (r == rank && !l->is_ghost()) {
-                    // Local leaf accelerations already computed
-                } else if (l->is_ghost() && field_idx < r_end) {
-                    // Update ghost leaf particle accelerations if received
-                }
-            }
+        if (total_acc_fields > 0) {
+            std::vector<double> recv_acc_buffer(total_acc_fields, 0.0);
+            MPI_Allgatherv(local_acc_buffer.data(), send_count, MPI_DOUBLE,
+                           recv_acc_buffer.data(), recv_counts.data(), displs.data(), MPI_DOUBLE, MPI_COMM_WORLD);
         }
     }
 }

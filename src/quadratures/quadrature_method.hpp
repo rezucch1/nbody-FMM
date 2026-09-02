@@ -37,4 +37,11 @@ class QuadratureMethod {
      * @return Mutable reference to particle velocity.
      */
     Tensor &velocity(Particle &p);
+
+    /**
+     * @brief Accesses mutable acceleration tensor of a particle.
+     * @param p Reference to particle.
+     * @return Mutable reference to particle acceleration.
+     */
+    Tensor &acceleration(Particle &p);
 };

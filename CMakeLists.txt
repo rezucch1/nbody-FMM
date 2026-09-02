@@ -21,7 +21,7 @@ add_compile_options(-O0 -g)
 include_directories(src ${HDF5_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_PATH})
 
 add_executable(nbody
-  src/main2.cpp
+  src/main.cpp
 )
 
 add_subdirectory(src)

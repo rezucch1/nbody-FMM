@@ -46,6 +46,12 @@ class Leaf : public NodeI {
     };
 
     /**
+     * @brief Gets contained particles vector reference.
+     * @return Const reference to particles array.
+     */
+    const std::vector<const Particle *> &get_particles() const { return particles; }
+
+    /**
      * @brief Evaluates total acceleration vectors for all particles in this leaf cell.
      *
      * Combines far-field local potential expansion gradient with near-field direct particle-particle interactions from neighbor nodes.
