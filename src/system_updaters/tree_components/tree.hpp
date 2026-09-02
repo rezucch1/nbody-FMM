@@ -32,6 +32,7 @@ class Tree {
     // REVIEW: &*end dereferences the past-the-end iterator (undefined behaviour),
     // and this assumes contiguous Particle storage despite the generic iterator API.
     // Accept a span/vector or pass begin plus std::distance(begin, end) instead.
+    // Or use iterators directly in init_tree() without dereferencing end.
     Tree(InputIt begin, InputIt end) { init_tree(&*begin, &*end); };
 
     /**

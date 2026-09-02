@@ -15,6 +15,8 @@
 
 constexpr unsigned int THRESHOLD = 5;
 
+// COMMENT if you use vectors begin and and as iterators, not pointers. It is true that normally
+// for vector thay are equivalent, but that is an implementation details, not a standard requirement
 void ParallelTree::init_parallel_tree(const Particle *begin, const Particle *end) {
     if (begin >= end) return;
 
@@ -402,10 +404,7 @@ void ParallelTree::compute_parallel_accelerations() {
             std::vector<double> recv_acc_buffer(total_acc_fields, 0.0);
             MPI_Allgatherv(local_acc_buffer.data(), send_count, MPI_DOUBLE,
                            recv_acc_buffer.data(), recv_counts.data(), displs.data(), MPI_DOUBLE, MPI_COMM_WORLD);
-            // REVIEW: recv_acc_buffer is discarded, so remote accelerations never
-            // reach the replicated particle array. Moreover local_acc_buffer is in
-            // unordered-map/Morton order, not particle-index order. Exchange explicit
-            // particle IDs with accelerations and unpack them deterministically.
+
         }
     }
 }

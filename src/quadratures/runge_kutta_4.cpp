@@ -34,6 +34,7 @@ void RungeKutta4::integrate(SystemUpdateMethod *method, std::vector<Particle> &p
 
   method->update(particles_k);
   for (unsigned int i = 0; i < particles.size(); ++i){
+    // acceleration_sum has zero size. you have to use emplace_back!
     accelerations_sum[i] = particles_k[i].get_acceleration();
     assert(!std::isnan(accelerations_sum[i].squared_norm()));
     velocity_sum[i] = velocity_k[i];
